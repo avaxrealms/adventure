@@ -16,13 +16,17 @@ contract RealmGold {
 
     adventure adv;
 
-    mapping(uint => mapping (uint => uint)) public allowance;
-    mapping(uint => uint) public balanceOf;
+    mapping(address => mapping (address => uint)) public allowance;
+    mapping(uint => mapping (uint => uint)) public summonerAllowance;
+    mapping(address => uint) public balanceOf;
+    mapping(uint => uint) public summonerBalance;
 
     mapping(uint => uint) public claimed;
 
-    event Transfer(uint indexed from, uint indexed to, uint amount);
-    event Approval(uint indexed from, uint indexed to, uint amount);
+    event gameTransferE(uint indexed from, uint indexed to, uint amount);
+    event gameApproval(uint indexed from, uint indexed to, uint amount);
+    event Transfer(address indexed from, address indexed to, uint amount);
+    event Approval(address indexed owner, address indexed spender, uint amount);
 
     constructor(adventure _adv) {
         adv = _adv;
@@ -59,19 +63,19 @@ contract RealmGold {
 
     function _gameMint(uint dst, uint amount) internal {
         totalSupply += amount;
-        balanceOf[dst] += amount;
-        emit Transfer(dst, dst, amount);
+        summonerBalance[dst] += amount;
+        emit gameTransferE(dst, dst, amount);
     }
 
     function gameApprove(uint from, uint spender, uint amount) external returns (bool) {
         require(_isApprovedOrOwner(from));
-        allowance[from][spender] = amount;
+        summonerAllowance[from][spender] = amount;
 
-        emit Approval(from, spender, amount);
+        emit gameApproval(from, spender, amount);
         return true;
     }
 
-    function summonerTransfer(uint from, uint to, uint amount) external returns (bool) {
+    function gameTransfer(uint from, uint to, uint amount) external returns (bool) {
         require(_isApprovedOrOwner(from));
         _gameTransferTokens(from, to, amount);
         return true;
@@ -80,13 +84,13 @@ contract RealmGold {
     function gameTransferFrom(uint executor, uint from, uint to, uint amount) external returns (bool) {
         require(_isApprovedOrOwner(executor));
         uint spender = executor;
-        uint spenderAllowance = allowance[from][spender];
+        uint spenderAllowance = summonerAllowance[from][spender];
 
         if (spender != from && spenderAllowance != type(uint).max) {
             uint newAllowance = spenderAllowance - amount;
-            allowance[from][spender] = newAllowance;
+            summonerAllowance[from][spender] = newAllowance;
 
-            emit Approval(from, spender, newAllowance);
+            emit gameApproval(from, spender, newAllowance);
         }
 
         _gameTransferTokens(from, to, amount);
@@ -94,12 +98,67 @@ contract RealmGold {
     }
 
     function _gameTransferTokens(uint from, uint to, uint amount) internal {
-        balanceOf[from] -= amount;
-        balanceOf[to] += amount;
+        summonerBalance[from] -= amount;
+        summonerBalance[to] += amount;
 
-        emit Transfer(from, to, amount);
+        emit gameTransferE(from, to, amount);
     }
 
     // --
 
+    function deposit(uint _summoner, uint amount) external {
+        require(_isApprovedOrOwner(_summoner));
+        _burn(msg.sender, amount);
+        summonerBalance[_summoner] += amount;
+    }
+
+    function _mint(address to, uint amount) internal {
+        // mint the amount
+        totalSupply += amount;
+        // transfer the amount to the recipient
+        balanceOf[to] += amount;
+        emit Transfer(address(0), to, amount);
+    }
+
+    function _burn(address from, uint amount) internal {
+        // burn the amount
+        totalSupply -= amount;
+        // transfer the amount from the recipient
+        balanceOf[from] -= amount;
+        emit Transfer(from, address(0), amount);
+    }
+
+    function approve(address spender, uint amount) external returns (bool) {
+        allowance[msg.sender][spender] = amount;
+
+        emit Approval(msg.sender, spender, amount);
+        return true;
+    }
+
+    function transfer(address dst, uint amount) external returns (bool) {
+        _transferTokens(msg.sender, dst, amount);
+        return true;
+    }
+
+    function transferFrom(address src, address dst, uint amount) external returns (bool) {
+        address spender = msg.sender;
+        uint spenderAllowance = allowance[src][spender];
+
+        if (spender != src && spenderAllowance != type(uint).max) {
+            uint newAllowance = spenderAllowance - amount;
+            allowance[src][spender] = newAllowance;
+
+            emit Approval(src, spender, newAllowance);
+        }
+
+        _transferTokens(src, dst, amount);
+        return true;
+    }
+
+    function _transferTokens(address src, address dst, uint amount) internal {
+        balanceOf[src] -= amount;
+        balanceOf[dst] += amount;
+
+        emit Transfer(src, dst, amount);
+    }
 }
