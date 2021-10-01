@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-contract codex {
+contract codex_base {
     string constant index = "Base";
     string constant class = "Generic";
     uint constant level = 0;
-    
+
     function classes(uint id) external pure returns (string memory description) {
         if (id == 0) {
             return "None";
@@ -73,7 +73,7 @@ contract codex {
             return "Warrior";
         }
     }
-    
+
     function school(uint id) external pure returns (string memory description) {
         if (id == 0) {
             return "Abjuration";
@@ -95,7 +95,7 @@ contract codex {
             return "Universal";
         }
     }
-    
+
     function casting_time(uint id) external pure returns (string memory description) {
         if (id == 0) {
             return "1 free action";
@@ -107,7 +107,7 @@ contract codex {
             return "10 full-round actions";
         }
     }
-    
+
     function range(uint id) external pure returns (string memory description) {
         if (id == 0) {
             return "Personal";
@@ -134,7 +134,7 @@ contract codex {
             return "Will";
         }
     }
-    
+
     function saving_throw_effect(uint id) external pure returns (string memory description) {
         if (id == 0) {
             return "None";

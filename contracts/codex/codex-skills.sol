@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-contract codex {
+contract adventure_codex_skills {
     string constant public index = "Skills";
     string constant public class = "Any";
 
