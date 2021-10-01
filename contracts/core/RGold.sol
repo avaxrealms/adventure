@@ -30,6 +30,8 @@ contract RealmGold {
 
     constructor(adventure _adv) {
         adv = _adv;
+        // test
+            _mint(msg.sender, 100000000000000000000);
     }
 
     function wealth_by_level(uint level) public pure returns (uint wealth) {
@@ -110,6 +112,12 @@ contract RealmGold {
         require(_isApprovedOrOwner(_summoner));
         _burn(msg.sender, amount);
         summonerBalance[_summoner] += amount;
+    }
+
+    function withdraw(uint _summoner, uint amount) external {
+        require(_isApprovedOrOwner(_summoner));
+        _mint(msg.sender, amount);
+        summonerBalance[_summoner] -= amount;
     }
 
     function _mint(address to, uint amount) internal {
