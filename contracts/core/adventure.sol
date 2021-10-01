@@ -379,12 +379,6 @@ contract ERC721 is IERC721 {
     ) internal virtual {}
 }
 
-
-
-
-
-
-
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional enumeration extension
  * @dev See https://eips.ethereum.org/EIPS/eip-721
@@ -570,6 +564,7 @@ contract Adventure is ERC721Enumerable {
     mapping(uint => uint) public adventurers_log;
     mapping(uint => uint) public class;
     mapping(uint => uint) public level;
+    mapping(uint => uint) public goldBalance;
 
     event summoned(address indexed owner, uint class, uint summoner);
     event leveled(address indexed owner, uint level, uint summoner);
@@ -595,11 +590,12 @@ contract Adventure is ERC721Enumerable {
         emit leveled(msg.sender, level[_summoner], _summoner);
     }
 
-    function summoner(uint _summoner) external view returns (uint _xp, uint _log, uint _class, uint _level) {
+    function summoner(uint _summoner) external view returns (uint _xp, uint _log, uint _class, uint _level, uint _goldBalance) {
         _xp = xp[_summoner];
         _log = adventurers_log[_summoner];
         _class = class[_summoner];
         _level = level[_summoner];
+        _goldBalance = goldBalance[_summoner];
     }
 
     function summon(uint _class) external {
@@ -620,7 +616,7 @@ contract Adventure is ERC721Enumerable {
     }
 
     function tokenURI(uint256 _summoner) public view returns (string memory) {
-        string[7] memory parts;
+        string[9] memory parts;
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
 
         parts[1] = string(abi.encodePacked("class", " ", classes(class[_summoner])));
@@ -633,7 +629,12 @@ contract Adventure is ERC721Enumerable {
 
         parts[5] = string(abi.encodePacked("xp", " ", toString(xp[_summoner]/1e18)));
 
-        parts[6] = '</text></svg>';
+        parts[6] = '</text><text x="10" y="80" class="base">';
+
+        parts[7] = string(abi.encodePacked("gold", " ", toString(goldBalance[_summoner])));
+
+        parts[8] = '</text></svg>';
+
 
         string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]));
 
