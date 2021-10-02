@@ -551,6 +551,10 @@ contract Adventure is ERC721Enumerable, AccessControl {
 
     bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
 
+    constructor() {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
     function retrieveAdventurerLog(uint _summoner) external view returns (uint) {
         return adventurers_log[_summoner];
     }

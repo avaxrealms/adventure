@@ -1,6 +1,4 @@
 
-const hre = require("hardhat");
-
 async function main() {
   const Adventure = await hre.ethers.getContractFactory("Adventure");
   const adventure = await Adventure.deploy();
@@ -97,14 +95,19 @@ async function main() {
             adventure_crafting_materials_i.address
           );
 
-          await snowbridgeDungeon
-            .deployed()
-            .then(async () => {
-              console.log(
-                `Snowbridge Dungeon deployed to: ${snowbridgeDungeon.address}`)
-              await adventure_crafting_materials_i.grantRole(ethers.utils.formatBytes32String("MINTER_CONTRACT"), snowbridgeDungeon.address)
-              }
+          await snowbridgeDungeon.deployed().then(async () => {
+            console.log(
+              `Snowbridge Dungeon deployed to: ${snowbridgeDungeon.address}`
             );
+            await adventure_crafting_materials_i.grantRole(
+              ethers.utils.formatBytes32String("MINTER_CONTRACT"),
+              snowbridgeDungeon.address
+            );
+            await adventure.grantRole(
+              ethers.utils.formatBytes32String("MANAGING_CONTRACT"),
+              snowbridgeDungeon.address
+            );
+          });
 
           const Adventure_crafting = await hre.ethers.getContractFactory(
             "adventure_crafting"
