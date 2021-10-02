@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
 interface adventure {
     function level(uint) external view returns (uint);
     function class(uint) external view returns (uint);
@@ -13,7 +15,7 @@ interface attributes {
     function ability_scores(uint) external view returns (uint32,uint32,uint32,uint32,uint32,uint32);
 }
 
-contract adventure_crafting_materials {
+contract adventure_crafting_materials is AccessControl {
     string public constant name = "Adventure Crafting Materials (I)";
     string public constant symbol = "Craft (I)";
     uint8 public constant decimals = 18;
@@ -24,9 +26,13 @@ contract adventure_crafting_materials {
     int public constant dungeon_armor_class = 2;
     uint constant DAY = 1 days;
 
+    bytes32 public constant MINTER_CONTRACT = keccak256("MINTER_CONTRACT");
+
     constructor (adventure _adv, attributes _attr) {
         adv = _adv;
         attr = _attr;
+
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function health_by_class(uint _class) public pure returns (uint health) {
@@ -168,7 +174,7 @@ contract adventure_crafting_materials {
         return adv.getApproved(_summoner) == msg.sender || adv.ownerOf(_summoner) == msg.sender;
     }
 
-    function _mint(uint dst, uint amount) internal {
+    function _mint(uint dst, uint amount) public onlyRole(MINTER_CONTRACT) {
         totalSupply += amount;
         balanceOf[dst] += amount;
         emit Transfer(dst, dst, amount);

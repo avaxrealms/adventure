@@ -1,3 +1,4 @@
+
 const hre = require("hardhat");
 
 async function main() {
@@ -86,6 +87,25 @@ async function main() {
       )
       .then(async () => {
         await adventure_crafting_materials_i.deployed().then(async () => {
+          const SnowbridgeDungeon = await hre.ethers.getContractFactory(
+            "adventure_dungeon_snowbridge"
+          );
+
+          const snowbridgeDungeon = await SnowbridgeDungeon.deploy(
+            adventure.address,
+            attributes.address,
+            adventure_crafting_materials_i.address
+          );
+
+          await snowbridgeDungeon
+            .deployed()
+            .then(async () => {
+              console.log(
+                `Snowbridge Dungeon deployed to: ${snowbridgeDungeon.address}`)
+              await adventure_crafting_materials_i.grantRole(ethers.utils.formatBytes32String("MINTER_CONTRACT"), snowbridgeDungeon.address)
+              }
+            );
+
           const Adventure_crafting = await hre.ethers.getContractFactory(
             "adventure_crafting"
           );
@@ -100,7 +120,9 @@ async function main() {
             codex_armor.address,
             codex_weapons.address
           );
-            console.log(`adventure_crafting deployed to: ${adventure_crafting.address}`)
+          console.log(
+            `adventure_crafting deployed to: ${adventure_crafting.address}`
+          );
         });
       });
   });

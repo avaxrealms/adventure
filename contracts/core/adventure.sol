@@ -2,6 +2,7 @@
 pragma solidity ^0.8.7;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 interface IERC721 {
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
@@ -29,27 +30,6 @@ interface IERC721 {
         uint256 tokenId,
         bytes calldata data
     ) external;
-}
-
-library Strings {
-    function toString(uint256 value) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0";
-        }
-        uint256 temp = value;
-        uint256 digits;
-        while (temp != 0) {
-            digits++;
-            temp /= 10;
-        }
-        bytes memory buffer = new bytes(digits);
-        while (value != 0) {
-            digits -= 1;
-            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-            value /= 10;
-        }
-        return string(buffer);
-    }
 }
 
 interface IERC721Receiver {
@@ -552,7 +532,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
     }
 }
 
-contract Adventure is ERC721Enumerable {
+contract Adventure is ERC721Enumerable, AccessControl {
     uint public next_summoner;
     uint constant xp_per_day = 250e18;
     uint constant DAY = 1 days;
@@ -569,6 +549,16 @@ contract Adventure is ERC721Enumerable {
     event summoned(address indexed owner, uint class, uint summoner);
     event leveled(address indexed owner, uint level, uint summoner);
 
+    bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
+
+    function retrieveAdventurerLog(uint _summoner) external view returns (uint) {
+        return adventurers_log[_summoner];
+    }
+
+    function setAdventurerLog(uint _summoner, uint _log) external onlyRole(MANAGING_CONTRACT)  {
+        adventurers_log[_summoner] = _log;
+    }
+
     function adventure(uint _summoner) external {
         require(_isApprovedOrOwner(msg.sender, _summoner));
         require(block.timestamp > adventurers_log[_summoner]);
@@ -580,6 +570,8 @@ contract Adventure is ERC721Enumerable {
         require(_isApprovedOrOwner(msg.sender, _summoner));
         xp[_summoner] -= _xp;
     }
+
+
 
     function level_up(uint _summoner) external {
         require(_isApprovedOrOwner(msg.sender, _summoner));
