@@ -40,6 +40,10 @@ contract RealmGold {
         }
     }
 
+    function summoner_wealth(uint _summoner) external view returns (uint) {
+        return summonerBalance[_summoner];
+    }
+
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
         return adv.getApproved(_summoner) == msg.sender || adv.ownerOf(_summoner) == msg.sender;
     }

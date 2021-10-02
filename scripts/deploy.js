@@ -1,3 +1,4 @@
+const hre = require("hardhat");
 
 async function main() {
   const Adventure = await hre.ethers.getContractFactory("Adventure");
@@ -12,9 +13,12 @@ async function main() {
   const RGold = await hre.ethers.getContractFactory("RealmGold");
   const rGold = await RGold.deploy(adventure.address);
 
-  await adventure
+  await rGold
     .deployed()
-    .then(() => console.log("RealmGold deployed to:", rGold.address));
+    .then(async () => {
+        console.log("RealmGold deployed to:", rGold.address)
+        await adventure.setGoldContract(rGold.address);
+    });
 
   const Base = await hre.ethers.getContractFactory("codex_base");
   const base = await Base.deploy();

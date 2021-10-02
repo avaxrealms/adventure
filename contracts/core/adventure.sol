@@ -4,6 +4,10 @@ pragma solidity ^0.8.7;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+interface realmgold {
+    function summoner_wealth(uint) external view returns (uint);
+}
+
 interface IERC721 {
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -535,16 +539,19 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
 contract Adventure is ERC721Enumerable, AccessControl {
     uint public next_summoner;
     uint constant xp_per_day = 250e18;
-    uint constant DAY = 1 days;
+    uint constant DAY = 1 seconds;
 
     string constant name = "Avaxrealms Adventure";
     string constant symbol = "ARA";
+
+    bool goldSet = false;
 
     mapping(uint => uint) public xp;
     mapping(uint => uint) public adventurers_log;
     mapping(uint => uint) public class;
     mapping(uint => uint) public level;
-    mapping(uint => uint) public goldBalance;
+
+    realmgold rg;
 
     event summoned(address indexed owner, uint class, uint summoner);
     event leveled(address indexed owner, uint level, uint summoner);
@@ -553,6 +560,12 @@ contract Adventure is ERC721Enumerable, AccessControl {
 
     constructor() {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+    function setGoldContract(realmgold _rg) external {
+        require(goldSet == false, "!gold!");
+        goldSet = true;
+        rg = _rg;
     }
 
     function retrieveAdventurerLog(uint _summoner) external view returns (uint) {
@@ -591,11 +604,11 @@ contract Adventure is ERC721Enumerable, AccessControl {
         _log = adventurers_log[_summoner];
         _class = class[_summoner];
         _level = level[_summoner];
-        _goldBalance = goldBalance[_summoner];
+        _goldBalance = rg.summoner_wealth(_summoner);
     }
 
     function summon(uint _class) external {
-        require(1 <= _class && _class <= 11);
+        require(1 <= _class && _class <= 11, "!class");
         uint _next_summoner = next_summoner;
         class[_next_summoner] = _class;
         level[_next_summoner] = 1;
@@ -627,7 +640,7 @@ contract Adventure is ERC721Enumerable, AccessControl {
 
         parts[6] = '</text><text x="10" y="80" class="base">';
 
-        parts[7] = string(abi.encodePacked("gold", " ", toString(goldBalance[_summoner])));
+        parts[7] = string(abi.encodePacked("gold", " ", toString(rg.summoner_wealth(_summoner)/1e18)));
 
         parts[8] = '</text></svg>';
 
