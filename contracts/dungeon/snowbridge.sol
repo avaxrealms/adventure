@@ -30,9 +30,7 @@ interface base_crafting_materials {
 }
 
 contract adventure_dungeon_snowbridge {
-    string public constant name = "Rarity Crafting Materials (I)";
-    string public constant symbol = "Craft (I)";
-    uint8 public constant decimals = 18;
+    string public constant name = "The Snow Bridge";
 
     int public constant dungeon_health = 10;
     int public constant dungeon_damage = 2;
