@@ -104,11 +104,11 @@ async function main() {
               `Snowbridge Dungeon deployed to: ${snowbridgeDungeon.address}`
             );
             await adventure_crafting_materials_i.grantRole(
-              ethers.utils.formatBytes32String("MINTER_CONTRACT"),
+              ethers.utils.keccak256(ethers.utils.toUtf8Bytes("MINTER_CONTRACT")),
               snowbridgeDungeon.address
             );
             await adventure.grantRole(
-              ethers.utils.formatBytes32String("MANAGING_CONTRACT"),
+              ethers.utils.keccak256(ethers.utils.toUtf8Bytes("MANAGING_CONTRACT")),
               snowbridgeDungeon.address
             );
           });
