@@ -1,138 +1,98 @@
 const hre = require("hardhat");
+require('hardhat-ethernal');
+
+function encodeRoleName(roleName) {
+  return ethers.utils.keccak256(
+    ethers.utils.toUtf8Bytes(roleName)
+  );
+}
+
+async function uploadToEthernal(name, instance) {
+  console.log(`Uploading ${name} to ethernal...`);
+  await hre.ethernal.push({
+    name: name,
+    address: instance.address
+  });
+}
+
+async function deployContract(name, ...constructorArgs) {
+  if (constructorArgs.length === 0) {
+    constructorArgs = null;
+  }
+
+  const Contract = await hre.ethers.getContractFactory(name);
+  const contract = await Contract.deploy.apply(Contract, constructorArgs);
+
+  return await contract
+    .deployed()
+    .then(() => {
+      uploadToEthernal(name, contract);
+      console.log(`${name} deployed to:`, contract.address);
+      return contract;
+    }).catch((err) => {
+      console.log(arguments);
+    });
+};
 
 async function main() {
-  const Adventure = await hre.ethers.getContractFactory("Adventure");
-  const adventure = await Adventure.deploy();
 
-  await adventure
-    .deployed()
-    .then(() =>
-      console.log("Avaxrealms Adventure deployed to:", adventure.address)
-    );
+  const adventure = await deployContract("Adventure");
+  const rGold     = await deployContract("RealmGold", adventure.address);
+  await adventure.setGoldContract(rGold.address);
+  console.log("Set gold contract address for adventure contract.");
 
-  const RGold = await hre.ethers.getContractFactory("RealmGold");
-  const rGold = await RGold.deploy(adventure.address);
+  // const base = await deployContract("codex_base");
 
-  await rGold
-    .deployed()
-    .then(async () => {
-        console.log("RealmGold deployed to:", rGold.address)
-        await adventure.setGoldContract(rGold.address);
-    });
+  const attributes = await deployContract("adventure_attributes", adventure.address);
 
-  const Base = await hre.ethers.getContractFactory("codex_base");
-  const base = await Base.deploy();
+  const codexSkills     = await deployContract("adventure_codex_skills");
+  const codexBaseRandom = await deployContract("codex_random");
 
-  const Attributes = await hre.ethers.getContractFactory(
-    "adventure_attributes"
+  const adventureCraftingMaterials = await deployContract(
+    "adventure_crafting_materials",
+    adventure.address,
+    attributes.address
   );
-  const attributes = await Attributes.deploy(adventure.address);
 
-  await attributes
-    .deployed()
-    .then(() => console.log("attributes deployed to:", attributes.address));
+  const codexGoods   = await deployContract("adventure_codex_goods");
+  const codexArmor   = await deployContract("adventure_codex_armor");
+  const codexWeapons = await deployContract("adventure_codex_weapons");
 
-  // --
-
-  const Codex_skills = await hre.ethers.getContractFactory(
-    "adventure_codex_skills"
+  const adventureSkills = await deployContract(
+    "adventure_skills",
+    adventure.address,
+    attributes.address,
+    codexSkills.address
   );
-  const codex_skills = await Codex_skills.deploy();
 
-  const Codex_base_random = await hre.ethers.getContractFactory("codex_random");
-  const codex_base_random = await Codex_base_random.deploy();
-
-  await codex_base_random
-    .deployed()
-    .then(() =>
-      console.log(`codex-base-random deployed to: ${codex_base_random.address}`)
-    );
-
-  const Adventure_crafting_materials_i = await hre.ethers.getContractFactory(
-    "adventure_crafting_materials"
+  const snowBridgeDungeon = await deployContract(
+    "adventure_dungeon_snowbridge",
+    adventure.address,
+    attributes.address,
+    adventureCraftingMaterials.address
   );
-  const adventure_crafting_materials_i =
-    await Adventure_crafting_materials_i.deploy(
-      adventure.address,
-      attributes.address
-    );
 
-  const Codex_goods = await hre.ethers.getContractFactory(
-    "adventure_codex_goods"
+  await adventureCraftingMaterials.grantRole(
+    encodeRoleName("MINTER_CONTRACT"),
+    snowBridgeDungeon.address
   );
-  const codex_goods = await Codex_goods.deploy();
-
-  const Codex_armor = await hre.ethers.getContractFactory(
-    "adventure_codex_armor"
+  await adventure.grantRole(
+    encodeRoleName("MANAGING_CONTRACT"),
+    snowBridgeDungeon.address
   );
-  const codex_armor = await Codex_armor.deploy();
 
-  const Codex_weapons = await hre.ethers.getContractFactory(
-    "adventure_codex_weapons"
+  const adventureCrafting = await deployContract(
+    "adventure_crafting",
+    adventure.address,
+    attributes.address,
+    adventureCraftingMaterials.address,
+    rGold.address,
+    codexSkills.address,
+    codexBaseRandom.address,
+    codexGoods.address,
+    codexArmor.address,
+    codexWeapons.address
   );
-  const codex_weapons = await Codex_weapons.deploy();
-
-  await codex_skills.deployed().then(async () => {
-    const Skills = await hre.ethers.getContractFactory("adventure_skills");
-    const skills = await Skills.deploy(
-      adventure.address,
-      attributes.address,
-      codex_skills.address
-    );
-
-    await skills
-      .deployed()
-      .then(() =>
-        console.log(
-          `skills deployed to: ${skills.address}, codex: ${codex_skills.address}`
-        )
-      )
-      .then(async () => {
-        await adventure_crafting_materials_i.deployed().then(async () => {
-          const SnowbridgeDungeon = await hre.ethers.getContractFactory(
-            "adventure_dungeon_snowbridge"
-          );
-
-          const snowbridgeDungeon = await SnowbridgeDungeon.deploy(
-            adventure.address,
-            attributes.address,
-            adventure_crafting_materials_i.address
-          );
-
-          await snowbridgeDungeon.deployed().then(async () => {
-            console.log(
-              `Snowbridge Dungeon deployed to: ${snowbridgeDungeon.address}`
-            );
-            await adventure_crafting_materials_i.grantRole(
-              ethers.utils.keccak256(ethers.utils.toUtf8Bytes("MINTER_CONTRACT")),
-              snowbridgeDungeon.address
-            );
-            await adventure.grantRole(
-              ethers.utils.keccak256(ethers.utils.toUtf8Bytes("MANAGING_CONTRACT")),
-              snowbridgeDungeon.address
-            );
-          });
-
-          const Adventure_crafting = await hre.ethers.getContractFactory(
-            "adventure_crafting"
-          );
-          const adventure_crafting = await Adventure_crafting.deploy(
-            adventure.address,
-            attributes.address,
-            adventure_crafting_materials_i.address,
-            rGold.address,
-            skills.address,
-            codex_base_random.address,
-            codex_goods.address,
-            codex_armor.address,
-            codex_weapons.address
-          );
-          console.log(
-            `adventure_crafting deployed to: ${adventure_crafting.address}`
-          );
-        });
-      });
-  });
 }
 
 main()
