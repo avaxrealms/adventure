@@ -1,5 +1,8 @@
+const fs  = require('fs');
 const hre = require("hardhat");
 require('hardhat-ethernal');
+
+const deployedContracts = {};
 
 function encodeRoleName(roleName) {
   return ethers.utils.keccak256(
@@ -28,6 +31,7 @@ async function deployContract(name, ...constructorArgs) {
     .then(() => {
       uploadToEthernal(name, contract);
       console.log(`${name} deployed to:`, contract.address);
+      deployedContracts[name] = contract.address;
       return contract;
     }).catch((err) => {
       console.log(arguments);
@@ -95,8 +99,16 @@ async function main() {
   );
 }
 
+function writeAddressesFile() {
+  fs.writeFileSync("./addresses.json", JSON.stringify(deployedContracts));
+};
+
 main()
-  .then(() => process.exit(0))
+  .then(() => {
+    console.log(deployedContracts);
+    writeAddressesFile();
+    process.exit(0);
+  })
   .catch((error) => {
     console.error(error);
     process.exit(1);
