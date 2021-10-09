@@ -572,8 +572,9 @@ contract Adventure is ERC721Enumerable, AccessControl {
         return adventurers_log[_summoner];
     }
 
-    function setAdventurerLog(uint _summoner, uint _log) external onlyRole(MANAGING_CONTRACT)  {
+    function setAdventurerLog(uint _summoner, uint _log) external onlyRole(MANAGING_CONTRACT) returns (uint) {
         adventurers_log[_summoner] = _log;
+        return _log;
     }
 
     function adventure(uint _summoner) external {
@@ -587,8 +588,6 @@ contract Adventure is ERC721Enumerable, AccessControl {
         require(_isApprovedOrOwner(msg.sender, _summoner));
         xp[_summoner] -= _xp;
     }
-
-
 
     function level_up(uint _summoner) external {
         require(_isApprovedOrOwner(msg.sender, _summoner));
