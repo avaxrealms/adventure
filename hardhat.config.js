@@ -9,33 +9,34 @@ const Game = require('./hardhat-extensions/play');
 // is a douchebag who wont provide commonJS compatibility.
 let terminalImage;
 (async () => {
-    terminalImage = (await import("terminal-image")).default;
+  terminalImage = (await import("terminal-image")).default;
 })();
 
 // Loading our extension (plugin) into HRE:
-extendEnvironment((hre) => {
-  let addresses = JSON.parse(fs.readFileSync("./addresses.json"));
-  hre.game = new Game(addresses);
-});
-
+if (fs.existsSync("./addresses.json")) {
+  extendEnvironment((hre) => {
+    let addresses = JSON.parse(fs.readFileSync("./addresses.json"));
+    hre.game = new Game(addresses);
+  });
+}
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-    solidity: {
-        version: "0.8.7",
-        settings: {
-            optimizer: {
-                enabled: true,
-                runs: 200
-            }
-        }
-    },
-    networks: {
-        localhost: {
-            url: "http://127.0.0.1:8545"
-        },
+  solidity: {
+    version: "0.8.7",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
     }
+  },
+  networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545"
+    },
+  }
 };
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -58,7 +59,7 @@ task("testmint", "Test mint one o dem and get the tokenURI")
     let txn = await contract.summon(taskArgs.tokenid);
     console.log(txn);
     //console.log(Buffer.from(uri, 'base64').toString('ascii'));
-});
+  });
 
 task("gettoken", "get token and show its svg")
   .addParam("contract", "contract address")
@@ -73,7 +74,7 @@ task("gettoken", "get token and show its svg")
     console.log(decoded);
     displayImage(parsed["image"]);
     console.log(await terminalImage.file('output.png', {width: '50%', height: '50%'}));
-});
+  });
 
 task("adventure", "adventure!")
   .addParam("contract", "contract address")
@@ -87,7 +88,7 @@ task("adventure", "adventure!")
     let uri = await contract.tokenURI(taskArgs.tokenid);
     console.log(uri);
     //console.log(Buffer.from(uri, 'base64').toString('ascii'));
-});
+  });
 
 task("levelup", "levelup!")
   .addParam("contract", "contract address")
@@ -101,7 +102,7 @@ task("levelup", "levelup!")
     let uri = await contract.tokenURI(taskArgs.tokenid);
     console.log(uri);
     //console.log(Buffer.from(uri, 'base64').toString('ascii'));
-});
+  });
 
 task("claimgold", "claim gold")
   .addParam("contract", "contract address")
@@ -116,7 +117,7 @@ task("claimgold", "claim gold")
     let uri = await contract.tokenURI(taskArgs.tokenid);
     console.log(uri);
     //console.log(Buffer.from(uri, 'base64').toString('ascii'));
-});
+  });
 
 //
 // Utility Functions
@@ -145,8 +146,8 @@ function svgToPng(svgFileName) {
     .toFile("output.png")
     .then(async function(info) {
       console.png(require('fs').readFileSync(__dirname + '/output.png'));
-  })
+    })
     .catch(function(err) {
-    console.log(err);
-  });
+      console.log(err);
+    });
 }
