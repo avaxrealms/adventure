@@ -539,7 +539,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
 contract Adventure is ERC721Enumerable, AccessControl {
     uint public next_summoner;
     uint constant xp_per_day = 250e18;
-    uint constant DAY = 1 seconds;
+    uint constant DAY = 1 days;
 
     string constant name = "Avaxrealms Adventure";
     string constant symbol = "ARA";
