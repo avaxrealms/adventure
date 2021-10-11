@@ -19,7 +19,7 @@ contract plunder_attacher {
         plunderContractAddress = _plunderContract;
     }
 
-    function length(string calldata str) internal pure returns (uint) {
+    function length(string calldata str) external pure returns (uint) {
         return bytes(str).length;
     }
 
