@@ -31,12 +31,40 @@ contract plunder_attacher {
         return string(slicedStr);
     }
 
+    modifier contains (string memory what, string memory where) {
+        bytes memory whatBytes = bytes (what);
+        bytes memory whereBytes = bytes (where);
+
+        bool found = false;
+        for (uint i = 0; i < whereBytes.length - whatBytes.length; i++) {
+            bool flag = true;
+            for (uint j = 0; j < whatBytes.length; j++)
+                if (whereBytes [i + j] != whatBytes [j]) {
+                    flag = false;
+                    break;
+                }
+            if (flag) {
+                found = true;
+                break;
+            }
+        }
+        require (found);
+        _;
+    }
+
+    function containssuffix (string memory str) public contains (" of ", str) {
+    }
+
     function test(string calldata str) external pure returns (bool) {
         string memory bonus = "+1";
         string memory item = str;
-        item = slice(length(str)-1, length(str), str);
-        if (keccak256(str) == keccak256(bytes(bonus))) {
+        uint len = bytes(item).length;
+        item = slice(len-1, len, str);
+        if (keccak256(abi.encodePacked(str)) == keccak256(bytes(bonus))) {
             return true;
+        }
+        else {
+            return false;
         }
     }
 }
