@@ -34,7 +34,7 @@ contract plunder_attacher {
     function test(string calldata str) external pure returns (bool) {
         string memory bonus = "+1";
         string memory item = str;
-        item = slice(str, length(str)-1, length(str), str);
+        item = slice(length(str)-1, length(str), str);
         if (keccak256(str) == keccak256(bytes(bonus))) {
             return true;
         }
