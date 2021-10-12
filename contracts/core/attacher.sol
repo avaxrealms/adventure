@@ -2,12 +2,21 @@
 pragma solidity ^0.8.7;
 pragma experimental ABIEncoderV2;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
 interface plunder {
     function balanceOf(address) external view returns (uint256);
+    function getChest(uint256) external view returns (string memory);
+    function getHead(uint256) external view returns (string memory);
+    function getFoot(uint256) external view returns (string memory);
+    function getHand(uint256) external view returns (string memory);
+    function getWeapon(uint256) external view returns (string memory);
 }
 
 interface attributes {
     function point_buy(uint, uint32, uint32, uint32, uint32, uint32, uint32) external view;
+    function apply_plunder_bonus(uint, uint32, uint32, uint32) external;
+
 }
 
 contract plunder_attacher {
@@ -17,6 +26,11 @@ contract plunder_attacher {
     constructor(address _plunderContract) {
         require(plunderContractAddress == address(0x0), "already initialized");
         plunderContractAddress = _plunderContract;
+    }
+
+    function attach(uint256 tokenId) public {
+        require(msg.sender == IERC721(plunderContractAddress).ownerOf(tokenId), "!owner");
+
     }
 
     function length(string calldata str) external pure returns (uint) {
@@ -31,11 +45,11 @@ contract plunder_attacher {
         return string(slicedStr);
     }
 
-    modifier contains (string memory what, string memory where) {
+    function contains (string memory what, string memory where) internal pure returns (bool found) {
         bytes memory whatBytes = bytes (what);
         bytes memory whereBytes = bytes (where);
 
-        bool found = false;
+        found = false;
         for (uint i = 0; i < whereBytes.length - whatBytes.length; i++) {
             bool flag = true;
             for (uint j = 0; j < whatBytes.length; j++)
@@ -49,10 +63,10 @@ contract plunder_attacher {
             }
         }
         require (found);
-        _;
     }
 
-    function containssuffix (string memory str) public contains (" of ", str) {
+    function containssuffix (string memory _str) external returns (bool) {
+        contains(" of ", _str);
     }
 
     function test(string calldata str) external pure returns (bool) {

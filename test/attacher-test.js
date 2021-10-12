@@ -32,7 +32,7 @@ describe("Attacher", function () {
     });
 
     it("Should return of in the item", async function () {
-        let suffix = await attacher.containssuffix(item)
+        let suffix = await attacher.containssuffix (item)
         }
     )
 });
