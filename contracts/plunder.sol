@@ -15,7 +15,7 @@ contract Plunder is ERC721Enumerable, ReentrancyGuard, Ownable {
     uint256 public constant MAX_NFT_SUPPLY = 10000;
     uint256 public constant RESERVED_SUPPLY = 100;
     uint public constant MAX_PURCHASABLE = 30;
-    uint256 public PLUNDER_PRICE = 3000000000000000000; // 3 AVAX
+    uint256 public PLUNDER_PRICE = 1000000000000000000; // 3 AVAX
 
     function withdraw() public payable onlyOwner {
         require(payable(msg.sender).send(address(this).balance));
