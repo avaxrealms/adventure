@@ -33,6 +33,12 @@ describe("Adventure", function () {
 			await adv.setGoldContract(rg.address);
 		});
 
+        _plunder = await ethers.getContractFactory("Plunder");
+        plunder = await _plunder.deploy();
+
+        _attacher = await ethers.getContractFactory("plunder_attacher");
+        attacher = await _attacher.deploy(plunder.address, attr.address);
+
 		await sd.deployed().then(async () => {
 			await craft_m.grantRole(
 				ethers.utils.keccak256(

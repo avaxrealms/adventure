@@ -7,11 +7,18 @@ describe("Attacher", function () {
     let item = "\"Doom Tear\" Chain of Defence +1"
 
     before(async function () {
+
+		_adv = await ethers.getContractFactory("Adventure");
+		adv = await _adv.deploy();
+
+		_attr = await ethers.getContractFactory("adventure_attributes");
+		attr = await _attr.deploy(adv.address);
+
         _plunder = await ethers.getContractFactory("Plunder");
         plunder = await _plunder.deploy();
 
         _attacher = await ethers.getContractFactory("plunder_attacher");
-        attacher = await _attacher.deploy(plunder.address);
+        attacher = await _attacher.deploy(plunder.address, attr.address);
     });
 
     it("Should return length", async function () {
@@ -32,7 +39,7 @@ describe("Attacher", function () {
     });
 
     it("Should return of in the item", async function () {
-        let suffix = await attacher.containssuffix (item)
+        let suffix = await attacher.containsSuffix (item)
         }
     )
 });

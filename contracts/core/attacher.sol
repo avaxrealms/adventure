@@ -22,15 +22,36 @@ interface attributes {
 contract plunder_attacher {
 
     address public plunderContractAddress;
+    mapping(uint256 => bool) attached;
 
-    constructor(address _plunderContract) {
+    plunder plunderContract;
+    attributes attributesContract;
+
+    constructor(plunder _plunderContract, attributes _attributesContract) {
         require(plunderContractAddress == address(0x0), "already initialized");
-        plunderContractAddress = _plunderContract;
+        plunderContract = _plunderContract;
+        attributesContract = _attributesContract;
     }
 
     function attach(uint256 tokenId) public {
         require(msg.sender == IERC721(plunderContractAddress).ownerOf(tokenId), "!owner");
+        require(attached[tokenId] = false, "!attached");
+        if (bonus(plunderContract.getWeapon(tokenId))) {
+            attributesContract.apply_plunder_bonus(tokenId, 1, 0, 0);
+        }
+    }
 
+    function bonus(string memory _str) public pure returns (bool) {
+        string memory item_bonus = "+1";
+        string memory item = _str;
+        uint len = bytes(item).length;
+        item = slice(len-1, len, _str);
+        if (keccak256(abi.encodePacked(_str)) == keccak256(bytes(item_bonus))) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     function length(string calldata str) external pure returns (uint) {
@@ -45,7 +66,7 @@ contract plunder_attacher {
         return string(slicedStr);
     }
 
-    function contains (string memory what, string memory where) internal pure returns (bool found) {
+    function contains(string memory what, string memory where) internal pure returns (bool found) {
         bytes memory whatBytes = bytes (what);
         bytes memory whereBytes = bytes (where);
 
@@ -65,20 +86,8 @@ contract plunder_attacher {
         require (found);
     }
 
-    function containssuffix (string memory _str) external returns (bool) {
+    function containsSuffix(string memory _str) external pure {
         contains(" of ", _str);
     }
 
-    function test(string calldata str) external pure returns (bool) {
-        string memory bonus = "+1";
-        string memory item = str;
-        uint len = bytes(item).length;
-        item = slice(len-1, len, str);
-        if (keccak256(abi.encodePacked(str)) == keccak256(bytes(bonus))) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
 }
