@@ -16,7 +16,7 @@ interface plunder {
 
 interface attributes {
     function point_buy(uint, uint32, uint32, uint32, uint32, uint32, uint32) external view;
-    function apply_plunder_bonus(uint, uint32, uint32, uint32) external;
+    function apply_plunder_bonus(uint, uint32, uint32) external;
 
 }
 
@@ -38,7 +38,7 @@ contract plunder_attacher {
         require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
         require(attached[tokenId] == address(0x0), "!attached");
         if (bonus(plunderContract.getHead(tokenId))) {
-            attached[tokenId] = msg.sender;
+            attributesContract.apply_plunder_bonus(_summoner, 1, 0);
         }
     }
 

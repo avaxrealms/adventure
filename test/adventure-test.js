@@ -117,5 +117,6 @@ describe("Adventure", function () {
         await attacher.attachPlunder(8, 0);
         console.log(await plunder.getHead(8));
         console.log(await attacher.bonus(plunder.getHead(8)));
+        console.log(await attr.ability_scores(0));
     });
 });
