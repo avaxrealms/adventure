@@ -47,7 +47,7 @@ contract plunder_attacher {
         string memory item = _str;
         uint len = bytes(item).length;
         item = slice(len-1, len, _str);
-        if (keccak256(abi.encodePacked(_str)) == keccak256(bytes(item_bonus))) {
+        if (keccak256(abi.encodePacked(item)) == keccak256(abi.encodePacked(item_bonus))) {
             return true;
         }
         else {
