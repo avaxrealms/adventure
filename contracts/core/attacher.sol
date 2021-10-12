@@ -11,6 +11,7 @@ interface plunder {
     function getFoot(uint256) external view returns (string memory);
     function getHand(uint256) external view returns (string memory);
     function getWeapon(uint256) external view returns (string memory);
+    function ownerOf(uint256) external view returns (address);
 }
 
 interface attributes {
@@ -22,7 +23,7 @@ interface attributes {
 contract plunder_attacher {
 
     address public plunderContractAddress;
-    mapping(uint256 => bool) attached;
+    mapping(uint256 => address) public attached;
 
     plunder plunderContract;
     attributes attributesContract;
@@ -33,11 +34,11 @@ contract plunder_attacher {
         attributesContract = _attributesContract;
     }
 
-    function attach(uint256 tokenId) public {
-        require(msg.sender == IERC721(plunderContractAddress).ownerOf(tokenId), "!owner");
-        require(attached[tokenId] = false, "!attached");
-        if (bonus(plunderContract.getWeapon(tokenId))) {
-            attributesContract.apply_plunder_bonus(tokenId, 1, 0, 0);
+    function attachPlunder(uint256 tokenId, uint _summoner) public {
+        require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
+        require(attached[tokenId] == address(0x0), "!attached");
+        if (bonus(plunderContract.getHead(tokenId))) {
+            attached[tokenId] = msg.sender;
         }
     }
 
