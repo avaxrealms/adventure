@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
 interface adventure {
     function level(uint) external view returns (uint);
     function getApproved(uint) external view returns (address);
     function ownerOf(uint) external view returns (address);
 }
 
-contract adventure_attributes {
+contract adventure_attributes is AccessControl {
 
     uint constant POINT_BUY = 32;
     adventure adv;
@@ -21,6 +23,8 @@ contract adventure_attributes {
         uint32 charisma;
     }
 
+    bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
+
     mapping(uint => ability_score) public ability_scores;
     mapping(uint => uint) public level_points_spent;
     mapping(uint => bool) public character_created;
@@ -30,6 +34,8 @@ contract adventure_attributes {
 
     constructor(adventure _adv) {
         adv = _adv;
+
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
@@ -44,6 +50,16 @@ contract adventure_attributes {
 
         ability_scores[_summoner] = ability_score(_str, _dex, _const, _int, _wis, _cha);
         emit Created(msg.sender, _summoner, _str, _dex, _const, _int, _wis, _cha);
+    }
+
+    function apply_plunder_bonus(uint _summoner, uint32 _str, uint32 _dex) external onlyRole(MANAGING_CONTRACT) {
+        require(!character_created[_summoner], "!exists");
+
+        ability_score storage _attrs = ability_scores[_summoner];
+        _attrs.strength = _attrs.strength + _str;
+        _attrs.dexterity = _attrs.dexterity + _dex;
+
+        ability_scores[_summoner] = _attrs;
     }
 
     function calculate_point_buy(uint _str, uint _dex, uint _const, uint _int, uint _wis, uint _cha) public pure returns (uint) {
