@@ -10,6 +10,7 @@ interface plunder {
     function getHead(uint256) external view returns (string memory);
     function getFoot(uint256) external view returns (string memory);
     function getHand(uint256) external view returns (string memory);
+    function getNeck(uint256) external view returns (string memory);
     function getWeapon(uint256) external view returns (string memory);
     function ownerOf(uint256) external view returns (address);
 }
@@ -37,22 +38,43 @@ contract plunder_attacher {
     function attachPlunder(uint256 tokenId, uint _summoner) public {
         require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
         require(attached[tokenId] == address(0x0), "!attached");
-        if (bonus(plunderContract.getHead(tokenId))) {
-            attributesContract.apply_plunder_bonus(_summoner, 1, 0);
-        }
+        uint32 str_bonus = 0;
+        uint32 dex_bonus = 0;
+
+        dex_bonus += bonus(plunderContract.getHead(tokenId));
+        dex_bonus += bonus(plunderContract.getNeck(tokenId));
+        dex_bonus += bonus(plunderContract.getChest(tokenId));
+        dex_bonus += bonus(plunderContract.getHand(tokenId));
+        dex_bonus += bonus(plunderContract.getFoot(tokenId));
+        str_bonus += bonus(plunderContract.getWeapon(tokenId));
+        attributesContract.apply_plunder_bonus(_summoner, str_bonus, dex_bonus);
     }
 
-    function bonus(string memory _str) public pure returns (bool) {
-        string memory item_bonus = "+1";
+    function bonus(string memory _str) public pure returns (uint32) {
+        string memory modifier_string = "+1";
+        string memory prefix_string = "\"";
         string memory item = _str;
         uint len = bytes(item).length;
+        uint32 total_bonus = 0;
+
+        // Check if item contains " of " and add +1 bonus
+        if (containsSuffix(item)) {
+            total_bonus += 1;
+        }
+
+        // Check if item contains "+1" and add +4 bonus
         item = slice(len-1, len, _str);
-        if (keccak256(abi.encodePacked(item)) == keccak256(abi.encodePacked(item_bonus))) {
-            return true;
+        if (keccak256(abi.encodePacked(item)) == keccak256(abi.encodePacked(modifier_string))) {
+            total_bonus  += 4;
         }
-        else {
-            return false;
+
+        // Check if item has prefix "\"" and add +2 bonus
+        item = slice(1, 1, _str);
+        if (keccak256(abi.encodePacked(item)) == keccak256(abi.encodePacked(prefix_string))) {
+            total_bonus  += 2;
         }
+
+        return total_bonus;
     }
 
     function length(string calldata str) external pure returns (uint) {
@@ -67,11 +89,10 @@ contract plunder_attacher {
         return string(slicedStr);
     }
 
-    function contains(string memory what, string memory where) internal pure returns (bool found) {
+    function contains(string memory what, string memory where) internal pure returns (bool) {
         bytes memory whatBytes = bytes (what);
         bytes memory whereBytes = bytes (where);
 
-        found = false;
         for (uint i = 0; i < whereBytes.length - whatBytes.length; i++) {
             bool flag = true;
             for (uint j = 0; j < whatBytes.length; j++)
@@ -80,15 +101,14 @@ contract plunder_attacher {
                     break;
                 }
             if (flag) {
-                found = true;
-                break;
+                return true;
             }
         }
-        require (found);
+        return false;
     }
 
-    function containsSuffix(string memory _str) external pure {
-        contains(" of ", _str);
+    function containsSuffix(string memory _str) internal pure returns (bool){
+        return contains(" of ", _str);
     }
 
 }

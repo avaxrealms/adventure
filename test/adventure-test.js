@@ -109,14 +109,34 @@ describe("Adventure", function () {
 //	});
 
     it("Mint a plunder equipment card", async function () {
-        await plunder.mint(9, { value: ethers.utils.parseEther("9")})
+        await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
+		// await plunder.mint(30, { value: ethers.utils.parseEther("30")});
         expect(plunder.ownerOf(0));
     });
 
     it("Attach a plunder card to a summoner", async function () {
-        await attacher.attachPlunder(8, 0);
-        console.log(await plunder.getHead(8));
-        console.log(await attacher.bonus(plunder.getHead(8)));
+		let token = 0;
+        await attacher.attachPlunder(token, 0);
+		console.log(await plunder.getHead(token));
+		console.log(await attacher.bonus(plunder.getHead(token)));
+		console.log(await plunder.getNeck(token));
+		console.log(await attacher.bonus(plunder.getNeck(token)));
+		console.log(await plunder.getChest(token));
+		console.log(await attacher.bonus(plunder.getChest(token)));
+		console.log(await plunder.getHand(token));
+		console.log(await attacher.bonus(plunder.getHand(token)));
+		console.log(await plunder.getFoot(token));
+		console.log(await attacher.bonus(plunder.getFoot(token)));
+		console.log(await plunder.getWeapon(token));
+		console.log(await attacher.bonus(plunder.getWeapon(token)));
         console.log(await attr.ability_scores(0));
     });
 });
