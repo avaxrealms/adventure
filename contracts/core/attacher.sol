@@ -58,7 +58,7 @@ contract plunder_attacher {
         uint32 total_bonus = 0;
 
         // Check if item contains " of " and add +1 bonus
-        if (containsSuffix(item)) {
+        if (contains(" of ", item)) {
             total_bonus += 1;
         }
 
@@ -107,8 +107,8 @@ contract plunder_attacher {
         return false;
     }
 
-    function containsSuffix(string memory _str) internal pure returns (bool){
-        return contains(" of ", _str);
-    }
+//    function containsSuffix(string memory _str) internal pure returns (bool){
+//        return contains(" of ", _str);
+//    }
 
 }
