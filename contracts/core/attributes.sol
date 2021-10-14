@@ -52,12 +52,26 @@ contract adventure_attributes is AccessControl {
         emit Created(msg.sender, _summoner, _str, _dex, _const, _int, _wis, _cha);
     }
 
-    function apply_plunder_bonus(uint _summoner, uint32 _str, uint32 _dex) external onlyRole(MANAGING_CONTRACT) {
-        require(!character_created[_summoner], "!exists");
-
+    function attribute_increment(uint _summoner, uint32 _str, uint32 _dex, uint32 _const, uint32 _int, uint32 _wis, uint32 _cha) external onlyRole(MANAGING_CONTRACT) {
         ability_score storage _attrs = ability_scores[_summoner];
         _attrs.strength = _attrs.strength + _str;
         _attrs.dexterity = _attrs.dexterity + _dex;
+        _attrs.constitution = _attrs.constitution + _const;
+        _attrs.intelligence = _attrs.intelligence + _int;
+        _attrs.wisdom = _attrs.wisdom + _wis;
+        _attrs.charisma = _attrs.charisma + _cha;
+
+        ability_scores[_summoner] = _attrs;
+    }
+
+    function attribute_decrement(uint _summoner, uint32 _str, uint32 _dex, uint32 _const, uint32 _int, uint32 _wis, uint32 _cha) external onlyRole(MANAGING_CONTRACT) {
+        ability_score storage _attrs = ability_scores[_summoner];
+        _attrs.strength = _attrs.strength - _str;
+        _attrs.dexterity = _attrs.dexterity - _dex;
+        _attrs.constitution = _attrs.constitution - _const;
+        _attrs.intelligence = _attrs.intelligence - _int;
+        _attrs.wisdom = _attrs.wisdom - _wis;
+        _attrs.charisma = _attrs.charisma - _cha;
 
         ability_scores[_summoner] = _attrs;
     }
