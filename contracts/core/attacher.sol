@@ -13,18 +13,20 @@ interface plunder {
     function getNeck(uint256) external view returns (string memory);
     function getWeapon(uint256) external view returns (string memory);
     function ownerOf(uint256) external view returns (address);
+    function transferFrom(address, address, uint256) external;
 }
 
 interface attributes {
     function point_buy(uint, uint32, uint32, uint32, uint32, uint32, uint32) external view;
-    function apply_plunder_bonus(uint, uint32, uint32) external;
-
+    function attribute_increment(uint, uint32, uint32, uint32, uint32, uint32, uint32) external;
+    function attribute_decrement(uint, uint32, uint32, uint32, uint32, uint32, uint32) external;
 }
 
 contract plunder_attacher {
 
     address public plunderContractAddress;
     mapping(uint256 => address) public attached;
+    mapping(address => uint) public summoners;
 
     plunder plunderContract;
     attributes attributesContract;
@@ -38,6 +40,11 @@ contract plunder_attacher {
     function attachPlunder(uint256 tokenId, uint _summoner) public {
         require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
         require(attached[tokenId] == address(0x0), "!attached");
+
+        attached[tokenId] = msg.sender;
+        summoners[msg.sender] = _summoner;
+        plunderContract.transferFrom(msg.sender, address(this), tokenId);
+
         uint32 str_bonus = 0;
         uint32 dex_bonus = 0;
 
@@ -47,7 +54,27 @@ contract plunder_attacher {
         dex_bonus += bonus(plunderContract.getHand(tokenId));
         dex_bonus += bonus(plunderContract.getFoot(tokenId));
         str_bonus += bonus(plunderContract.getWeapon(tokenId));
-        attributesContract.apply_plunder_bonus(_summoner, str_bonus, dex_bonus);
+        attributesContract.attribute_increment(_summoner, str_bonus+1, dex_bonus+1, 1, 1, 1, 1);
+    }
+
+    function detachPlunder(uint256 tokenId) public {
+        require(attached[tokenId] == msg.sender, "!owner");
+
+        attached[tokenId] = address(0x0);
+        plunderContract.transferFrom(msg.sender, address(this), tokenId);
+
+        uint32 str_bonus = 0;
+        uint32 dex_bonus = 0;
+
+        dex_bonus += bonus(plunderContract.getHead(tokenId));
+        dex_bonus += bonus(plunderContract.getNeck(tokenId));
+        dex_bonus += bonus(plunderContract.getChest(tokenId));
+        dex_bonus += bonus(plunderContract.getHand(tokenId));
+        dex_bonus += bonus(plunderContract.getFoot(tokenId));
+        str_bonus += bonus(plunderContract.getWeapon(tokenId));
+        attributesContract.attribute_decrement(summoners[msg.sender], str_bonus+1, dex_bonus+1, 1, 1, 1, 1);
+
+        summoners[msg.sender] = 0;
     }
 
     function bonus(string memory _str) public pure returns (uint32) {

@@ -72,7 +72,7 @@ describe("Adventure", function () {
 	it("Should summon an adventurer", async function () {
 		for (let x = 0; x < test_runs; x++) {
 			await adv.summon(8).then(async () => {
-				console.log(await attr.ability_scores(x));
+				// console.log(await attr.ability_scores(x));
 				expect((await adv.summoner(x))[3]).to.equal(0x1);
 			});
 		}
@@ -119,8 +119,9 @@ describe("Adventure", function () {
 
     it("Attach a plunder card to a summoner", async function () {
 		for (let token = 0; token < test_runs; token++) {
+            console.log("-----------------------------------------");
 			console.log("Running attach for token " + token)
-			console.log(await attr.ability_scores(token));
+            await plunder.connect(accounts[0]).approve(attacher.address, token)
 			await attacher.attachPlunder(token, token);
 			console.log(await plunder.getHead(token));
 			console.log(await attacher.bonus(plunder.getHead(token)));
