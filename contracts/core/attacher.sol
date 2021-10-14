@@ -55,10 +55,10 @@ contract plunder_attacher {
     function detachPlunder(uint256 tokenId) public {
         require(attached[msg.sender].plunderId == tokenId, "!owner");
 
-        plunderContract.transferFrom(address(this), msg.sender, tokenId);
-
         attached[msg.sender].plunderId = 0;
         attached[msg.sender].summonerId = 0;
+
+        plunderContract.transferFrom(address(this), msg.sender, tokenId);
 
         modifyAttributes(attached[msg.sender].summonerId, tokenId, 1, false);
     }
@@ -112,7 +112,7 @@ contract plunder_attacher {
         return bytes(str).length;
     }
 
-    function slice(uint256 begin, uint256 end, string memory str) public pure returns (string memory) {
+    function slice(uint256 begin, uint256 end, string memory str) internal pure returns (string memory) {
         bytes memory slicedStr = new bytes(end-begin+1);
         for(uint i=0; i<=end-begin; i++){
             slicedStr[i] = bytes(str)[i+begin-1];
