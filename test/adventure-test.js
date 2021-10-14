@@ -71,7 +71,7 @@ describe("Adventure", function () {
 
 	it("Should summon an adventurer", async function () {
 		for (let x = 0; x < test_runs; x++) {
-			await adv.summon(8).then(async () => {
+			await adv.connect(accounts[x]).summon(8).then(async () => {
 				// console.log(await attr.ability_scores(x));
 				expect((await adv.summoner(x))[3]).to.equal(0x1);
 			});
@@ -112,7 +112,7 @@ describe("Adventure", function () {
 
     it("Mint a plunder equipment card", async function () {
 		for (let x = 0; x < test_runs; x++) {
-			await plunder.mint(1, {value: ethers.utils.parseEther("1")});
+			await plunder.connect(accounts[x]).mint(1, {value: ethers.utils.parseEther("1")});
 		}
 		expect(plunder.ownerOf(0));
     });
@@ -121,8 +121,8 @@ describe("Adventure", function () {
 		for (let token = 0; token < test_runs; token++) {
             console.log("-----------------------------------------");
 			console.log("Running attach for token " + token)
-            await plunder.connect(accounts[0]).approve(attacher.address, token)
-			await attacher.attachPlunder(token, token);
+            await plunder.connect(accounts[token]).approve(attacher.address, token)
+			await attacher.connect(accounts[token]).attachPlunder(token, token);
 			console.log(await plunder.getHead(token));
 			console.log(await attacher.bonus(plunder.getHead(token)));
 			console.log(await plunder.getNeck(token));
