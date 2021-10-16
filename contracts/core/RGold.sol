@@ -7,6 +7,10 @@ interface adventure {
     function ownerOf(uint) external view returns (address);
 }
 
+interface plunder {
+    function ownerOf(uint256) external view returns (address);
+}
+
 contract RealmGold {
     string public constant name = "Realm Gold";
     string public constant symbol = "RGold";
@@ -14,24 +18,43 @@ contract RealmGold {
 
     uint public totalSupply = 0;
 
+    // Every Plunderer is entitled to 10,000 Realm Gold
+    uint256 public realmGoldPerTokenId = 10000 * (10**decimals);
+
+    uint256 public tokenIdStart = 0;
+    uint256 public tokenIdEnd = 10000;
+
     adventure adv;
+    plunder plun;
 
     mapping(address => mapping (address => uint)) public allowance;
     mapping(uint => mapping (uint => uint)) public summonerAllowance;
-    mapping(address => uint) public balanceOf;
+    mapping(address => uint) public balances;
     mapping(uint => uint) public summonerBalance;
 
     mapping(uint => uint) public claimed;
+    mapping(address => uint) public dropped;
 
     event gameTransferE(uint indexed from, uint indexed to, uint amount);
     event gameApproval(uint indexed from, uint indexed to, uint amount);
     event Transfer(address indexed from, address indexed to, uint amount);
     event Approval(address indexed owner, address indexed spender, uint amount);
 
-    constructor(adventure _adv) {
+    constructor(adventure _adv, plunder _plun) {
         adv = _adv;
-        // test
-            _mint(msg.sender, 100000000000000000000);
+        plun = _plun;
+    }
+
+    function claimByPlunder(uint256 tokenId) external {
+        require(msg.sender == plun.ownerOf(tokenId), "!owner");
+        _claim(tokenId, msg.sender);
+    }
+
+    function _claim(uint256 tokenId, address tokenOwner) internal {
+        require(tokenId >= tokenIdStart && tokenId <= tokenIdEnd, "!exists");
+        require(dropped[msg.sender] == 0);
+
+        _mint(tokenOwner, realmGoldPerTokenId);
     }
 
     function wealth_by_level(uint level) public pure returns (uint wealth) {
@@ -128,7 +151,7 @@ contract RealmGold {
         // mint the amount
         totalSupply += amount;
         // transfer the amount to the recipient
-        balanceOf[to] += amount;
+        balances[to] += amount;
         emit Transfer(address(0), to, amount);
     }
 
@@ -136,7 +159,7 @@ contract RealmGold {
         // burn the amount
         totalSupply -= amount;
         // transfer the amount from the recipient
-        balanceOf[from] -= amount;
+        balances[from] -= amount;
         emit Transfer(from, address(0), amount);
     }
 
@@ -168,9 +191,13 @@ contract RealmGold {
     }
 
     function _transferTokens(address src, address dst, uint amount) internal {
-        balanceOf[src] -= amount;
-        balanceOf[dst] += amount;
+        balances[src] -= amount;
+        balances[dst] += amount;
 
         emit Transfer(src, dst, amount);
+    }
+
+    function balanceOf(address account) public view returns (uint256) {
+        return balances[account];
     }
 }

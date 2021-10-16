@@ -41,7 +41,8 @@ async function deployContract(name, ...constructorArgs) {
 async function main() {
 
   const adventure = await deployContract("Adventure");
-  const rGold     = await deployContract("RealmGold", adventure.address);
+  const plunder = await deployContract("Plunder");
+  const rGold     = await deployContract("RealmGold", adventure.address, plunder.address);
   await adventure.setGoldContract(rGold.address);
   console.log("Set gold contract address for adventure contract.");
 

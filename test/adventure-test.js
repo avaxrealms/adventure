@@ -5,7 +5,7 @@ describe("Adventure", function () {
 	let _adv;
 	let adv;
 	let level;
-	let test_runs = 10;
+    let test_runs = 1;
     let accounts;
 
     async function mineBlocks(seconds) {
@@ -20,8 +20,11 @@ describe("Adventure", function () {
 		_adv = await ethers.getContractFactory("Adventure");
 		adv = await _adv.deploy();
 
+        _plunder = await ethers.getContractFactory("Plunder");
+        plunder = await _plunder.deploy();
+
 		_rg = await ethers.getContractFactory("RealmGold");
-		rg = await _rg.deploy(adv.address);
+		rg = await _rg.deploy(adv.address, plunder.address);
 
 		_attr = await ethers.getContractFactory("adventure_attributes");
 		attr = await _attr.deploy(adv.address);
@@ -37,9 +40,6 @@ describe("Adventure", function () {
 		await rg.deployed().then(async () => {
 			await adv.setGoldContract(rg.address);
 		});
-
-        _plunder = await ethers.getContractFactory("Plunder");
-        plunder = await _plunder.deploy();
 
         _attacher = await ethers.getContractFactory("plunder_attacher");
         attacher = await _attacher.deploy(plunder.address, attr.address);
@@ -72,49 +72,58 @@ describe("Adventure", function () {
 	it("Should summon an adventurer", async function () {
 		for (let x = 0; x < test_runs; x++) {
 			await adv.connect(accounts[x]).summon(8).then(async () => {
-				// console.log(await attr.ability_scores(x));
 				expect((await adv.summoner(x))[3]).to.equal(0x1);
 			});
 		}
 	});
 
-//    it("Should send the summoner on an adventure", async function () {
-//        let daysToPass = 60;
-//        console.log(`${daysToPass} days of adventuring, hold...`);
-//
-//
-//        for (let i = 0; i < daysToPass; i++) {
-//            await adv.adventure(0);
-//            await mineBlocks(86400);
-//        }
-//    });
-//
-//    it("Should level the summoner up", async function () {
-//        for (let i = 0; i < 3; i++) {
-//            await adv.level_up(0);
-//        }
-//
-//
-//        expect((await adv.summoner(0))[3]).to.equal(0x4);
-//    });
-//
-//	it("Should increase attributes", async function () {
-//		await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
-//	});
-//
-//    it("Should adventure through the snowbridge", async function () {
-//        await sd.adventure(0);
-//    });
-//
-//	it("Should have a balance of 1 Craft (I)", async function () {
-//		expect(await craft_m.balanceOf(0)).to.equal(0x1);
-//	});
+    it("Should send the summoner on an adventure", async function () {
+        let daysToPass = 60;
+        console.log(`${daysToPass} days of adventuring, hold...`);
+
+
+        for (let i = 0; i < daysToPass; i++) {
+            await adv.adventure(0);
+            await mineBlocks(86400);
+        }
+    });
+
+    it("Should level the summoner up", async function () {
+        for (let i = 0; i < 3; i++) {
+            await adv.level_up(0);
+        }
+
+
+        expect((await adv.summoner(0))[3]).to.equal(0x4);
+    });
+
+	it("Should increase attributes", async function () {
+		await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
+	});
+
+    it("Should adventure through the snowbridge", async function () {
+        await sd.adventure(0);
+    });
+
+	it("Should have a balance of 1 Craft (I)", async function () {
+		expect(await craft_m.balanceOf(0)).to.equal(0x1);
+	});
 
     it("Mint a plunder equipment card", async function () {
 		for (let x = 0; x < test_runs; x++) {
 			await plunder.connect(accounts[x]).mint(1, {value: ethers.utils.parseEther("1")});
 		}
 		expect(plunder.ownerOf(0));
+    });
+
+    it("Should fail claiming without a plunder", async function () {
+        await expect(rg.connect(accounts[1]).claimByPlunder(0)).to.be.revertedWith("!owner");
+    });
+
+    it("Should claim RealmGold", async function () {
+        await rg.claimByPlunder(0);
+        console.log("Balance: ", ethers.utils.formatEther(await rg.balanceOf(accounts[0].address)));
+        expect(ethers.utils.formatEther(await rg.balanceOf(accounts[0].address))).to.equal("10100.0");
     });
 
     it("Attach a plunder card to a summoner", async function () {
