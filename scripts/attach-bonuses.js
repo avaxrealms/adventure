@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 async function main() {
 	let attacher;
-	let token = 165;
+	let token = 116;
 
 	_adv = await ethers.getContractFactory("Adventure");
 	adv = await _adv.deploy();
@@ -29,6 +29,13 @@ async function main() {
 			plunder.getFoot,
 			plunder.getWeapon,
 		];
+
+        let base_stats = [
+            'Constitution',
+            'Intelligence',
+            'Wisdom',
+            'Charisma',
+        ];
 		console.log(
 			`If Plunder #${token} were to be attached to a summoner, stat boosts:`
 		);
@@ -46,6 +53,11 @@ async function main() {
 				} ${stat}: ${await part.call(plunder, token)}`
 			);
 		}
+	    console.log(`-------------------------------------`);
+        for (let _stat of base_stats) {
+            total += 1;
+            console.log(`+1 ${_stat}: Attach Bonus`);
+        }
 		console.log(`Total: ${total}`);
 	});
 }
