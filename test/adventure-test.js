@@ -123,7 +123,11 @@ describe("Adventure", function () {
     it("Should claim RealmGold", async function () {
         await rg.claimByPlunder(0);
         console.log("Balance: ", ethers.utils.formatEther(await rg.balanceOf(accounts[0].address)));
-        expect(ethers.utils.formatEther(await rg.balanceOf(accounts[0].address))).to.equal("10100.0");
+        expect(ethers.utils.formatEther(await rg.balanceOf(accounts[0].address))).to.equal("10000.0");
+    });
+
+    it("Should fail a double claim", async function () {
+        await expect(rg.claimByPlunder(0)).to.be.revertedWith("!claimed");
     });
 
     it("Attach a plunder card to a summoner", async function () {

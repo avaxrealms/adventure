@@ -52,8 +52,9 @@ contract RealmGold {
 
     function _claim(uint256 tokenId, address tokenOwner) internal {
         require(tokenId >= tokenIdStart && tokenId <= tokenIdEnd, "!exists");
-        require(dropped[msg.sender] == 0);
+        require(dropped[msg.sender] == 0, "!claimed");
 
+        dropped[msg.sender] = realmGoldPerTokenId;
         _mint(tokenOwner, realmGoldPerTokenId);
     }
 
