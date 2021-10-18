@@ -13,6 +13,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2",
     "hardhat-ethernal": "^0.3.10",
-    "hardhat-gas-reporter": "^1.0.4"
+    "hardhat-gas-reporter": "^1.0.4",
+    "hardhat-storage-layout": "^0.1.6"
   }
 }

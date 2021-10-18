@@ -4,6 +4,7 @@ const fs = require('fs');
 require('hardhat-ethernal');
 require("hardhat-gas-reporter");
 require("solidity-coverage");
+require('hardhat-storage-layout');
 const Game = require('./hardhat-extensions/play');
 
 // This is a hack to import terminal-image because the author
@@ -12,6 +13,16 @@ let terminalImage;
 (async () => {
   terminalImage = (await import("terminal-image")).default;
 })();
+
+task("storage", "Prints storage layout", async (taskArgs, hre) => {
+  try {
+    await hre.storageLayout.export();
+  } catch(err) {
+    console.log("ERROR:");
+    console.log(err);
+    console.log("Please be sure to compile before running storage");
+  }
+});
 
 // Loading our extension (plugin) into HRE:
 if (fs.existsSync("./addresses.json")) {
@@ -30,7 +41,12 @@ module.exports = {
       optimizer: {
         enabled: false,
         runs: 200
-      }
+      },
+      outputSelection: {
+        "*": {
+          "*": ["storageLayout"],
+        },
+      },
     }
   },
   networks: {
