@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("solidity-coverage");
 const fs = require('fs');
 require('hardhat-ethernal');
 require("hardhat-gas-reporter");
