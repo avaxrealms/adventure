@@ -625,7 +625,7 @@ contract Adventure is ERC721Enumerable, AccessControl {
 
     function tokenURI(uint256 _summoner) public view returns (string memory) {
         string[9] memory parts;
-        parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
+        parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base, .title, .id {fill: #16140a; font-family: nocturne-serif, "Nocturne Serif", serif; font-size: 9.7px; font-weight: 500;} .title{font-size:16px;} .id{font-size:12px; fill: #ba3e4a;}</style><style>@import url("https://use.typekit.net/nln0qsp.css");</style><rect width="100%" height="100%" fill="#bfb67f" /><text x="25" y="70" class="base">';
 
         parts[1] = string(abi.encodePacked("class", " ", classes(class[_summoner])));
 
@@ -641,7 +641,7 @@ contract Adventure is ERC721Enumerable, AccessControl {
 
         parts[7] = string(abi.encodePacked("gold", " ", toString(rg.summoner_wealth(_summoner)/1e18)));
 
-        parts[8] = '</text></svg>';
+        parts[8] = '</text><text x="250" y="300" class="title">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#ba3e4a;stroke-width:1"/></svg>';
 
 
         string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], parts[8]));

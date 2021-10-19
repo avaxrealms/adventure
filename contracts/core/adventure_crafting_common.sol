@@ -650,14 +650,14 @@ contract adventure_crafting is ERC721Enumerable {
                 string memory _name,
                 string memory _description
             ) = goods.item_by_id(_data.item_type);
-            output = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
+            output = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base, .title, .id {fill: #16140a; font-family: nocturne-serif, "Nocturne Serif", serif; font-size: 9.7px; font-weight: 500;} .title{font-size:16px;} .id{font-size:12px; fill: #ba3e4a;}</style><style>@import url("https://use.typekit.net/nln0qsp.css");</style><rect width="100%" height="100%" fill="#bfb67f" /><text x="25" y="70" class="base">';
             output = string(abi.encodePacked(output, "category ", get_type(_data.base_type), '</text><text x="10" y="40" class="base">'));
             output = string(abi.encodePacked(output, "name ", _name, '</text><text x="10" y="60" class="base">'));
             output = string(abi.encodePacked(output, "cost ", toString(_cost/1e18), "gp", '</text><text x="10" y="80" class="base">'));
             output = string(abi.encodePacked(output, "weight ", toString(_weight), "lb", '</text><text x="10" y="100" class="base">'));
             output = string(abi.encodePacked(output, "description ", _description, '</text><text x="10" y="120" class="base">'));
             output = string(abi.encodePacked(output, "crafted by ", toString(_data.crafter), '</text><text x="10" y="140" class="base">'));
-            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text></svg>'));
+            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="250" y="300" class="title">Plunder</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#ba3e4a;stroke-width:1"/></svg>'));
         }
         output = string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(string(abi.encodePacked('{"name": "item #', toString(_item), '", "description": "Rarity tier 1, non magical, item crafting.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))))));
 
