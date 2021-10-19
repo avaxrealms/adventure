@@ -40,6 +40,14 @@ contract plunder_attacher {
         attributesContract = _attributesContract;
     }
 
+    function slice(uint256 begin, uint256 end, string memory str) public pure returns (string memory) {
+        bytes memory slicedStr = new bytes(end-begin+1);
+        for(uint i=0; i<=end-begin; i++){
+            slicedStr[i] = bytes(str)[i+begin-1];
+        }
+        return string(slicedStr);
+    }
+
     function attachPlunder(uint256 tokenId, uint _summoner) public {
         require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
         require(attached[msg.sender].plunderId == 0, "!attached");
@@ -110,14 +118,6 @@ contract plunder_attacher {
 
     function length(string calldata str) external pure returns (uint) {
         return bytes(str).length;
-    }
-
-    function slice(uint256 begin, uint256 end, string memory str) internal pure returns (string memory) {
-        bytes memory slicedStr = new bytes(end-begin+1);
-        for(uint i=0; i<=end-begin; i++){
-            slicedStr[i] = bytes(str)[i+begin-1];
-        }
-        return string(slicedStr);
     }
 
     function contains(string memory what, string memory where) internal pure returns (bool) {

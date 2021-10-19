@@ -29,6 +29,7 @@ describe("Adventure", function () {
     _attr = await ethers.getContractFactory("adventure_attributes");
     attr = await _attr.deploy(adv.address);
 
+
     _craft_m = await ethers.getContractFactory(
       "adventure_crafting_materials"
     );
@@ -70,6 +71,8 @@ describe("Adventure", function () {
   });
 
   it("Should summon an adventurer", async function () {
+    console.log(await adv.tokenURI(0))
+
     for (let x = 0; x < test_runs; x++) {
       await adv.connect(accounts[x]).summon(8).then(async () => {
 	expect((await adv.summoner(x))[3]).to.equal(0x1);
@@ -99,6 +102,7 @@ describe("Adventure", function () {
 
   it("Should increase attributes", async function () {
     await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
+    //console.log(await attr.tokenURI(0));
   });
 
   it("Should adventure through the snowbridge", async function () {
