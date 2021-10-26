@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.7;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+
 
 contract Plunder is ERC721Enumerable, ReentrancyGuard, Ownable {
 
