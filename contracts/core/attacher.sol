@@ -2,7 +2,7 @@
 pragma solidity ^0.8.7;
 pragma experimental ABIEncoderV2;
 
-import "../../node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 interface plunder {
     function balanceOf(address) external view returns (uint256);
