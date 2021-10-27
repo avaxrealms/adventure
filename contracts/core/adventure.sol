@@ -628,19 +628,19 @@ contract Adventure is ERC721Enumerable, AccessControl {
 
         parts[1] = string(abi.encodePacked("class", " ", classes(class[_summoner])));
 
-        parts[2] = '</text><text x="10" y="40" class="base">';
+        parts[2] = '</text><text x="25" y="40" class="base">';
 
         parts[3] = string(abi.encodePacked("level", " ", toString(level[_summoner])));
 
-        parts[4] = '</text><text x="10" y="60" class="base">';
+        parts[4] = '</text><text x="25" y="60" class="base">';
 
         parts[5] = string(abi.encodePacked("xp", " ", toString(xp[_summoner]/1e18)));
 
-        parts[6] = '</text><text x="10" y="80" class="base">';
+        parts[6] = '</text><text x="25" y="80" class="base">';
 
         parts[7] = string(abi.encodePacked("gold", " ", toString(rg.summoner_wealth(_summoner)/1e18)));
 
-        parts[8] = '</text><text x="250" y="300" class="title">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#ba3e4a;stroke-width:1"/></svg>';
+        parts[8] = '</text><text x="250" y="300" class="title">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>';
 
 
         string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], parts[8]));
