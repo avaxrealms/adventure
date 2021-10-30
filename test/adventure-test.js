@@ -1,5 +1,57 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const sharp = require('sharp');
+
+const fs = require('fs');
+
+// This is a hack to import terminal-image because the author
+// is a douchebag who wont provide commonJS compatibility.
+let terminalImage;
+(async () => {
+  terminalImage = (await import("terminal-image")).default;
+})();
+
+//
+// Utility Functions for displaying SVGs
+//
+
+function displayImage(name, uri) {
+  svgDataToFile(uri, name + ".svg");
+  svgToPng(name);
+}
+
+function decodeUri(uri) {
+  b64 = uri.split(',')[1];
+  let buff = Buffer.from(b64, 'base64');
+  return buff.toString('ascii');
+}
+
+function svgDataToFile(uri, filename) {
+  b64 = uri.split(',')[1];
+  let buff = Buffer.from(b64, 'base64');
+  let ascii = buff.toString('ascii');
+  fs.writeFileSync(filename, ascii);
+}
+
+function svgToPng(filename) {
+  sharp(filename + ".svg")
+    .png()
+    .toFile(filename + ".png")
+    .then(async function(info) {
+      console.png(require('fs').readFileSync(filename + '.png'));
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
+}
+
+async function uriToImage(name, uri) {
+    let decoded = decodeUri(uri);
+    let parsed = JSON.parse(decoded);
+    console.log(decoded);
+
+    displayImage(name, parsed["image"]);
+}
 
 describe("Adventure", function () {
   let _adv;
@@ -71,7 +123,15 @@ describe("Adventure", function () {
   });
 
   it("Should summon an adventurer", async function () {
-    console.log(await adv.tokenURI(0))
+    let uri = await adv.tokenURI(0)
+
+    await uriToImage('summoner', uri);
+    // let decoded = decodeUri(uri);
+    // let parsed = JSON.parse(decoded);
+    // console.log(decoded);
+
+    // displayImage("summoner", parsed["image"]);
+    // console.log(await terminalImage.file('summoner.png', {width: '75%', height: '75%'}));
 
     for (let x = 0; x < test_runs; x++) {
       await adv.connect(accounts[x]).summon(8).then(async () => {
@@ -102,6 +162,8 @@ describe("Adventure", function () {
 
   it("Should increase attributes", async function () {
     await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
+    let uri = await attr.tokenURI(0);
+    await uriToImage("attrs", uri);
     //console.log(await attr.tokenURI(0));
   });
 
