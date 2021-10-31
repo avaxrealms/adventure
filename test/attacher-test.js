@@ -37,9 +37,4 @@ describe("Attacher", function () {
     let bonus2 = await attacher.slice(1, 1, item);
     expect(bonus2).to.equal("\"");
   });
-
-  it("Should return of in the item", async function () {
-    let suffix = await attacher.containsSuffix (item)
-  }
-    )
 });
