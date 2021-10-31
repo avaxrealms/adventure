@@ -23,9 +23,6 @@ function svgToPng(filename) {
   sharp(filename + ".svg")
     .png()
     .toFile(filename + ".png")
-    .then(async function(info) {
-      console.png(require('fs').readFileSync(filename + '.png'));
-    })
     .catch(function(err) {
       console.log(err);
     });
@@ -34,7 +31,6 @@ function svgToPng(filename) {
 async function uriToImage(name, uri) {
     let decoded = decodeUri(uri);
     let parsed = JSON.parse(decoded);
-    console.log(decoded);
 
     displayImage(name, parsed["image"]);
 }

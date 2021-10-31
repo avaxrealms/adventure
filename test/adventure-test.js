@@ -9,10 +9,10 @@ let terminalImage;
   terminalImage = (await import("terminal-image")).default;
 })();
 
-//
-// Utility Functions for displaying SVGs
-//
-
+async function mineBlocks(seconds) {
+  await network.provider.send("evm_increaseTime", [seconds]);
+  await network.provider.send("evm_mine")
+}
 
 describe("Adventure", function () {
   let _adv;
@@ -21,12 +21,7 @@ describe("Adventure", function () {
   let test_runs = 1;
   let accounts;
 
-  async function mineBlocks(seconds) {
-    await network.provider.send("evm_increaseTime", [seconds]);
-    await network.provider.send("evm_mine")
-  }
-
-  before(async function () {
+  beforeEach(async function () {
 
     accounts = await hre.ethers.getSigners();
 
@@ -39,21 +34,18 @@ describe("Adventure", function () {
     _rg = await ethers.getContractFactory("RealmGold");
     rg = await _rg.deploy(adv.address, plunder.address);
 
+    await rg.deployed().then(async () => {
+      await adv.setGoldContract(rg.address);
+    });
+
     _attr = await ethers.getContractFactory("adventure_attributes");
     attr = await _attr.deploy(adv.address);
 
-
-    _craft_m = await ethers.getContractFactory(
-      "adventure_crafting_materials"
-    );
+    _craft_m = await ethers.getContractFactory("adventure_crafting_materials");
     craft_m = await _craft_m.deploy(adv.address, attr.address);
 
     _sd = await ethers.getContractFactory("adventure_dungeon_snowbridge");
     sd = await _sd.deploy(adv.address, attr.address, craft_m.address);
-
-    await rg.deployed().then(async () => {
-      await adv.setGoldContract(rg.address);
-    });
 
     _attacher = await ethers.getContractFactory("plunder_attacher");
     attacher = await _attacher.deploy(plunder.address, attr.address);
@@ -83,99 +75,142 @@ describe("Adventure", function () {
     });
   });
 
-  it("Should summon an adventurer", async function () {
-    let uri = await adv.tokenURI(0)
+  describe("balanceOf", async function() {
+    it("Should return one when one summoner is owned", async function() {
+      let account = accounts[0];
 
-    await uriToImage('summoner', uri);
-    // let decoded = decodeUri(uri);
-    // let parsed = JSON.parse(decoded);
-    // console.log(decoded);
+      await adv.connect(account).summon(1);
+      expect(await adv.balanceOf(account.address)).to.equal(1);
+    });
 
-    // displayImage("summoner", parsed["image"]);
-    // console.log(await terminalImage.file('summoner.png', {width: '75%', height: '75%'}));
+    it("Should return two when two summoners are owned", async function() {
+      let account = accounts[3];
 
-    for (let x = 0; x < test_runs; x++) {
-      await adv.connect(accounts[x]).summon(8).then(async () => {
-	expect((await adv.summoner(x))[3]).to.equal(0x1);
-      });
-    }
+      await adv.connect(account).summon(1);
+      await adv.connect(account).summon(2);
+      expect(await adv.balanceOf(account.address)).to.equal(2);
+    });
+
+    it("Should return zero when none are owned", async function() {
+      let account = accounts[4];
+      expect(await adv.balanceOf(account.address)).to.equal(0);
+    });
   });
 
-  it("Should send the summoner on an adventure", async function () {
-    let daysToPass = 60;
-    console.log(`${daysToPass} days of adventuring, hold...`);
-
-
-    for (let i = 0; i < daysToPass; i++) {
-      await adv.adventure(0);
-      await mineBlocks(86400);
-    }
+  describe("ownerOf", async function() {
+    it("Should return the address of the owner", async function() {
+      let account = accounts[0]
+      await adv.connect(account).summon(1);
+      expect(await adv.totalSupply()).to.equal(1);
+      expect(await adv.ownerOf(0)).to.equal(account.address);
+    });
   });
 
-  it("Should level the summoner up", async function () {
-    for (let i = 0; i < 3; i++) {
-      await adv.level_up(0);
-    }
+  describe("summon", async function() {
+    it("Should summon an adventurer", async function () {
+      let account = accounts[0];
 
-
-    expect((await adv.summoner(0))[3]).to.equal(0x4);
+      expect(await adv.totalSupply()).to.equal(0);
+      await adv.connect(account).summon(1);
+      expect(await adv.totalSupply()).to.equal(1);
+    });
   });
 
-  it("Should increase attributes", async function () {
-    await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
-    let uri = await attr.tokenURI(0);
-    await uriToImage("attrs", uri);
-    //console.log(await attr.tokenURI(0));
+  describe("tokenURI", async function() {
+    it('should not error out', async function() {
+      let account = accounts[0];
+      await adv.connect(account).summon(1);
+      let uri = await adv.tokenURI(1)
+      await uriToImage('summoner', uri); // Write the svg out as a convenience
+    });
   });
 
-  it("Should adventure through the snowbridge", async function () {
-    await sd.adventure(0);
+  describe("level_up", async function() {
+    it("Should level the summoner up", async function() {
+
+      let daysToPass = 60;
+      console.log(`${daysToPass} days of adventuring, hold...`);
+      let account = accounts[0];
+      await adv.connect(account).summon(1);
+
+      for (let i = 0; i < daysToPass; i++) {
+        await adv.adventure(0);
+        await mineBlocks(86400);
+      }
+
+      await adv.connect(account).level_up(0)
+
+      expect((await adv.summoner(0))[3]).to.equal("2");
+    });
   });
 
-  it("Should have a balance of 1 Craft (I)", async function () {
-    expect(await craft_m.balanceOf(0)).to.equal(0x1);
+  describe("point_buy", async function() {
+    it("Should increase attributes", async function () {
+      let account = accounts[0];
+      await adv.connect(account).summon(1);
+
+      let daysToPass = 60;
+      for (let i = 0; i < daysToPass; i++) {
+        await adv.adventure(0);
+        await mineBlocks(86400);
+      }
+
+      await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
+      let uri = await attr.tokenURI(0);
+      await uriToImage("attrs", uri);
+      await uriToImage(uri);
+      // TODO This isn't a test unless it has an expect/assert
+    });
   });
 
-  it("Mint a plunder equipment card", async function () {
-    for (let x = 0; x < test_runs; x++) {
-      await plunder.connect(accounts[x]).mint(1, {value: ethers.utils.parseEther("1")});
-    }
-    expect(plunder.ownerOf(0));
-  });
+  // it("Should adventure through the snowbridge", async function () {
+  //   await sd.adventure(0);
+  // });
 
-  it("Should fail claiming without a plunder", async function () {
-    await expect(rg.connect(accounts[1]).claimByPlunder(0)).to.be.revertedWith("!owner");
-  });
+  // it("Should have a balance of 1 Craft (I)", async function () {
+  //   expect(await craft_m.balanceOf(0)).to.equal(0x1);
+  // });
 
-  it("Should claim RealmGold", async function () {
-    await rg.claimByPlunder(0);
-    console.log("Balance: ", ethers.utils.formatEther(await rg.balanceOf(accounts[0].address)));
-    expect(ethers.utils.formatEther(await rg.balanceOf(accounts[0].address))).to.equal("10000.0");
-  });
+  // it("Mint a plunder equipment card", async function () {
+  //   for (let x = 0; x < test_runs; x++) {
+  //     await plunder.connect(accounts[x]).mint(1, {value: ethers.utils.parseEther("1")});
+  //   }
+  //   expect(plunder.ownerOf(0));
+  // });
 
-  it("Should fail a double claim", async function () {
-    await expect(rg.claimByPlunder(0)).to.be.revertedWith("!claimed");
-  });
+  // it("Should fail claiming without a plunder", async function () {
+  //   await expect(rg.connect(accounts[1]).claimByPlunder(0)).to.be.revertedWith("!owner");
+  // });
 
-  it("Attach a plunder card to a summoner", async function () {
-    for (let token = 0; token < test_runs; token++) {
-      console.log("-----------------------------------------");
-      console.log("Running attach for token " + token)
-      await plunder.connect(accounts[token]).approve(attacher.address, token)
-      await attacher.connect(accounts[token]).attachPlunder(token, token);
-      console.log(await plunder.getHead(token));
-      console.log(await attacher.bonus(plunder.getHead(token)));
-      console.log(await plunder.getNeck(token));
-      console.log(await attacher.bonus(plunder.getNeck(token)));
-      console.log(await plunder.getChest(token));
-      console.log(await attacher.bonus(plunder.getChest(token)));
-      console.log(await plunder.getHand(token));
-      console.log(await attacher.bonus(plunder.getHand(token)));
-      console.log(await plunder.getFoot(token));
-      console.log(await attacher.bonus(plunder.getFoot(token)));
-      console.log(await plunder.getWeapon(token));
-      console.log(await attacher.bonus(plunder.getWeapon(token)));
-      console.log(await attr.ability_scores(token));
-    }
-  });
+  // it("Should claim RealmGold", async function () {
+  //   await rg.claimByPlunder(0);
+  //   console.log("Balance: ", ethers.utils.formatEther(await rg.balanceOf(accounts[0].address)));
+  //   expect(ethers.utils.formatEther(await rg.balanceOf(accounts[0].address))).to.equal("10000.0");
+  // });
+
+  // it("Should fail a double claim", async function () {
+  //   await expect(rg.claimByPlunder(0)).to.be.revertedWith("!claimed");
+  // });
+
+  // it("Attach a plunder card to a summoner", async function () {
+  //   for (let token = 0; token < test_runs; token++) {
+  //     console.log("-----------------------------------------");
+  //     console.log("Running attach for token " + token)
+  //     await plunder.connect(accounts[token]).approve(attacher.address, token)
+  //     await attacher.connect(accounts[token]).attachPlunder(token, token);
+  //     console.log(await plunder.getHead(token));
+  //     console.log(await attacher.bonus(plunder.getHead(token)));
+  //     console.log(await plunder.getNeck(token));
+  //     console.log(await attacher.bonus(plunder.getNeck(token)));
+  //     console.log(await plunder.getChest(token));
+  //     console.log(await attacher.bonus(plunder.getChest(token)));
+  //     console.log(await plunder.getHand(token));
+  //     console.log(await attacher.bonus(plunder.getHand(token)));
+  //     console.log(await plunder.getFoot(token));
+  //     console.log(await attacher.bonus(plunder.getFoot(token)));
+  //     console.log(await plunder.getWeapon(token));
+  //     console.log(await attacher.bonus(plunder.getWeapon(token)));
+  //     console.log(await attr.ability_scores(token));
+  //   }
+  // });
 });
