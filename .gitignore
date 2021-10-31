@@ -7,4 +7,6 @@ coverage.json
 #Hardhat files
 cache
 artifacts
+*.svg
+*.png
 addresses.json
