@@ -119,8 +119,8 @@ describe("Adventure", function () {
   describe("tokenURI", async function() {
     it('should not error out', async function() {
       let account = accounts[0];
-      await adv.connect(account).summon(1);
-      let uri = await adv.tokenURI(1)
+      await adv.connect(account).summon(8);
+      let uri = await adv.tokenURI(0)
       await uriToImage('summoner', uri); // Write the svg out as a convenience
     });
   });
