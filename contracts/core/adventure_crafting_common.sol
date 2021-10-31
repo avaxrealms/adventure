@@ -657,7 +657,7 @@ contract adventure_crafting is ERC721Enumerable {
             output = string(abi.encodePacked(output, "weight ", toString(_weight), "lb", '</text><text x="25" y="100" class="base">'));
             output = string(abi.encodePacked(output, "description ", _description, '</text><text x="25" y="120" class="base">'));
             output = string(abi.encodePacked(output, "crafted by ", toString(_data.crafter), '</text><text x="25" y="140" class="base">'));
-            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="250" y="300" class="title">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
+            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
         }
         output = string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(string(abi.encodePacked('{"name": "item #', toString(_item), '", "description": "Rarity tier 1, non magical, item crafting.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))))));
 
@@ -690,7 +690,7 @@ contract adventure_crafting is ERC721Enumerable {
             output = string(abi.encodePacked(output, "spell failure ", toString(_spell_failure), "%", '</text><text x="25" y="200" class="base">'));
             output = string(abi.encodePacked(output, "description ", _description, '</text><text x="25" y="220" class="base">'));
             output = string(abi.encodePacked(output, "crafted by ", toString(_data.crafter), '</text><text x="25" y="240" class="base">'));
-            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="250" y="300" class="title">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
+            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
         }
         output = string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(string(abi.encodePacked('{"name": "item #', toString(_item), '", "description": "Rarity tier 1, non magical, item crafting.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))))));
     }
@@ -711,7 +711,7 @@ contract adventure_crafting is ERC721Enumerable {
             output = string(abi.encodePacked(output, "range ", toString(_weapon.range_increment), "ft", '</text><text x="25" y="200" class="base">'));
             output = string(abi.encodePacked(output, "description ", _weapon.description, '</text><text x="25" y="220" class="base">'));
             output = string(abi.encodePacked(output, "crafted by ", toString(_data.crafter), '</text><text x="25" y="240" class="base">'));
-            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="250" y="300" class="title">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
+            output = string(abi.encodePacked(output, "crafted at ", toString(_data.crafted), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
         }
         output = string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(string(abi.encodePacked('{"name": "item #', toString(_item), '", "description": "Rarity tier 1, non magical, item crafting.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))))));
     }

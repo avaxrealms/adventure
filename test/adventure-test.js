@@ -154,12 +154,22 @@ describe("Adventure", function () {
         await adv.adventure(0);
         await mineBlocks(86400);
       }
+      for (let i=0;i>8;i++) {
+        await adv.connect(account).level_up(0)
+      }
 
-      await attr.point_buy(0, 8, 18, 15, 8, 15, 8);
+      // Expect that the summoner is minted
+      expect(await adv.ownerOf(0)).to.equal(account.address);
+
+      await attr.connect(account).point_buy(0, 8, 18, 15, 8, 15, 8);
+
+      let scores = await attr.connect(account).ability_scores(0);
+      expect(scores[0]).to.equal(8);
+      expect(scores[1]).to.equal(18);
+
+
       let uri = await attr.tokenURI(0);
       await uriToImage("attrs", uri);
-      await uriToImage(uri);
-      // TODO This isn't a test unless it has an expect/assert
     });
   });
 
