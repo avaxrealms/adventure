@@ -33,7 +33,7 @@ contract RealmGold {
     mapping(uint => uint) public summonerBalance;
 
     mapping(uint => uint) public claimed;
-    mapping(address => uint) public dropped;
+    mapping(uint256 => uint) public dropped;
 
     event gameTransferE(uint indexed from, uint indexed to, uint amount);
     event gameApproval(uint indexed from, uint indexed to, uint amount);
@@ -52,9 +52,9 @@ contract RealmGold {
 
     function _claim(uint256 tokenId, address tokenOwner) internal {
         require(tokenId >= tokenIdStart && tokenId <= tokenIdEnd, "!exists");
-        require(dropped[msg.sender] == 0, "!claimed");
+        require(dropped[tokenId] == 0, "!claimed");
 
-        dropped[msg.sender] = realmGoldPerTokenId;
+        dropped[tokenId] = realmGoldPerTokenId;
         _mint(tokenOwner, realmGoldPerTokenId);
     }
 
