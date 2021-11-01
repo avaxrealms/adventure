@@ -626,19 +626,19 @@ contract Adventure is ERC721Enumerable, AccessControl {
         string[9] memory parts;
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base, .title, .id {fill: #16140a; font-family: nocturne-serif, "Nocturne Serif", serif; font-size: 9.7px; font-weight: 500;} .title{font-size:16px;} .id{font-size:12px; fill: #ba3e4a;}</style><style>@import url("https://use.typekit.net/nln0qsp.css");</style><rect width="100%" height="100%" fill="#bfb67f" /><text x="25" y="70" class="base">';
 
-        parts[1] = string(abi.encodePacked("class", " ", classes(class[_summoner])));
+        parts[1] = string(abi.encodePacked("Class:", " ", classes(class[_summoner])));
 
         parts[2] = '</text><text x="25" y="90" class="base">';
 
-        parts[3] = string(abi.encodePacked("level", " ", toString(level[_summoner])));
+        parts[3] = string(abi.encodePacked("Level:", " ", toString(level[_summoner])));
 
         parts[4] = '</text><text x="25" y="110" class="base">';
 
-        parts[5] = string(abi.encodePacked("xp", " ", toString(xp[_summoner]/1e18)));
+        parts[5] = string(abi.encodePacked("XP:", " ", toString(xp[_summoner]/1e18)));
 
         parts[6] = '</text><text x="25" y="130" class="base">';
 
-        parts[7] = string(abi.encodePacked("gold", " ", toString(rg.summoner_wealth(_summoner)/1e18)));
+        parts[7] = string(abi.encodePacked("Realm Gold:", " ", toString(rg.summoner_wealth(_summoner)/1e18)));
 
         parts[8] = '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>';
 

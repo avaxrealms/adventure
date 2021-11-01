@@ -151,17 +151,17 @@ contract adventure_attributes is AccessControl {
         ability_score memory _attr = ability_scores[_summoner];
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base, .title, .id {fill: #16140a; font-family: nocturne-serif, "Nocturne Serif", serif; font-size: 9.7px; font-weight: 500;} .title{font-size:16px;} .id{font-size:12px; fill: #ba3e4a;}</style><style>@import url("https://use.typekit.net/nln0qsp.css");</style><rect width="100%" height="100%" fill="#bfb67f" /><text x="25" y="70" class="base">';
 
-        parts[1] = string(abi.encodePacked("strength", " ", toString(_attr.strength), '</text><text x="25" y="90" class="base">'));
+        parts[1] = string(abi.encodePacked("Strength:", " ", toString(_attr.strength), '</text><text x="25" y="90" class="base">'));
 
-        parts[2] = string(abi.encodePacked("dexterity", " ", toString(_attr.dexterity), '</text><text x="25" y="110" class="base">'));
+        parts[2] = string(abi.encodePacked("Dexterity:", " ", toString(_attr.dexterity), '</text><text x="25" y="110" class="base">'));
 
-        parts[3] = string(abi.encodePacked("constitution", " ", toString(_attr.constitution), '</text><text x="25" y="130" class="base">'));
+        parts[3] = string(abi.encodePacked("Constitution:", " ", toString(_attr.constitution), '</text><text x="25" y="130" class="base">'));
 
-        parts[4] = string(abi.encodePacked("intelligence", " ", toString(_attr.intelligence),  '</text><text x="25" y="150" class="base">'));
+        parts[4] = string(abi.encodePacked("Intelligence:", " ", toString(_attr.intelligence),  '</text><text x="25" y="150" class="base">'));
 
-        parts[5] = string(abi.encodePacked("wisdom", " ", toString(_attr.wisdom), '</text><text x="25" y="170" class="base">'));
+        parts[5] = string(abi.encodePacked("Wisdom:", " ", toString(_attr.wisdom), '</text><text x="25" y="170" class="base">'));
 
-        parts[6] = string(abi.encodePacked("charisma", " ", toString(_attr.charisma), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
+        parts[6] = string(abi.encodePacked("Charisma:", " ", toString(_attr.charisma), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
 
         output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]));
         }
