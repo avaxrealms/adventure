@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
+import "@openzeppelin/contracts/security/Pausable.sol";
+
 interface adventure {
     function level(uint) external view returns (uint);
     function getApproved(uint) external view returns (address);
@@ -11,7 +13,7 @@ interface plunder {
     function ownerOf(uint256) external view returns (address);
 }
 
-contract RealmGold {
+contract RealmGold is Pausable {
     string public constant name = "Realm Gold";
     string public constant symbol = "RGold";
     uint8 public constant decimals = 18;
@@ -45,7 +47,7 @@ contract RealmGold {
         plun = _plun;
     }
 
-    function claimByPlunder(uint256 tokenId) external {
+    function claimByPlunder(uint256 tokenId) external whenNotPaused() {
         require(msg.sender == plun.ownerOf(tokenId), "!owner");
         _claim(tokenId, msg.sender);
     }
@@ -81,7 +83,7 @@ contract RealmGold {
         }
     }
 
-    function claim(uint summoner) external {
+    function claim(uint summoner) external whenNotPaused() {
         require(_isApprovedOrOwner(summoner));
         uint _current_level = adv.level(summoner);
         uint _claimed_for = claimed[summoner]+1;
@@ -136,13 +138,13 @@ contract RealmGold {
 
     // --
 
-    function deposit(uint _summoner, uint amount) external {
+    function deposit(uint _summoner, uint amount) external whenNotPaused() {
         require(_isApprovedOrOwner(_summoner));
         _burn(msg.sender, amount);
         summonerBalance[_summoner] += amount;
     }
 
-    function withdraw(uint _summoner, uint amount) external {
+    function withdraw(uint _summoner, uint amount) external whenNotPaused() {
         require(_isApprovedOrOwner(_summoner));
         _mint(msg.sender, amount);
         summonerBalance[_summoner] -= amount;

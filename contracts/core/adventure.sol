@@ -2,6 +2,7 @@
 pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 interface realmgold {
     function summoner_wealth(uint) external view returns (uint);
@@ -535,7 +536,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
     }
 }
 
-contract Adventure is ERC721Enumerable, AccessControl {
+contract Adventure is ERC721Enumerable, AccessControl, Pausable {
     uint public next_summoner;
     uint constant xp_per_day = 250e18;
     uint constant DAY = 1 days;
@@ -576,19 +577,19 @@ contract Adventure is ERC721Enumerable, AccessControl {
         return _log;
     }
 
-    function adventure(uint _summoner) external {
+    function adventure(uint _summoner) external whenNotPaused() {
         require(_isApprovedOrOwner(msg.sender, _summoner));
         require(block.timestamp > adventurers_log[_summoner]);
         adventurers_log[_summoner] = block.timestamp + DAY;
         xp[_summoner] += xp_per_day;
     }
 
-    function spend_xp(uint _summoner, uint _xp) external {
+    function spend_xp(uint _summoner, uint _xp) external whenNotPaused() {
         require(_isApprovedOrOwner(msg.sender, _summoner));
         xp[_summoner] -= _xp;
     }
 
-    function level_up(uint _summoner) external {
+    function level_up(uint _summoner) external whenNotPaused() {
         require(_isApprovedOrOwner(msg.sender, _summoner));
         uint _level = level[_summoner];
         uint _xp_required = xp_required(_level);
@@ -605,7 +606,7 @@ contract Adventure is ERC721Enumerable, AccessControl {
         _goldBalance = rg.summoner_wealth(_summoner);
     }
 
-    function summon(uint _class) external {
+    function summon(uint _class) external whenNotPaused() {
         require(1 <= _class && _class <= 11, "!class");
         uint _next_summoner = next_summoner;
         class[_next_summoner] = _class;

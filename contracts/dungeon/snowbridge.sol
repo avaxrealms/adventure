@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
+import "@openzeppelin/contracts/security/Pausable.sol";
+
 interface adventure {
     function level(uint) external view returns (uint);
     function class(uint) external view returns (uint);
@@ -19,7 +21,7 @@ interface base_crafting_materials {
     function _mint(uint, uint) external;
 }
 
-contract adventure_dungeon_snowbridge {
+contract adventure_dungeon_snowbridge is Pausable {
     string public constant name = "The Snow Bridge";
 
     int public constant dungeon_health = 10;
@@ -152,7 +154,7 @@ contract adventure_dungeon_snowbridge {
         }
     }
 
-    function adventure(uint _summoner) external returns (uint reward) {
+    function adventure(uint _summoner) external whenNotPaused() returns (uint reward) {
         require(_isApprovedOrOwner(_summoner), "!owner");
         require(block.timestamp > adv.retrieveAdventurerLog(_summoner), "!log");
         adv.setAdventurerLog(_summoner, block.timestamp + DAY);

@@ -3,6 +3,7 @@ pragma solidity ^0.8.7;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 interface plunder {
     function balanceOf(address) external view returns (uint256);
@@ -22,7 +23,7 @@ interface attributes {
     function attribute_decrement(uint, uint32, uint32, uint32, uint32, uint32, uint32) external;
 }
 
-contract plunder_attacher {
+contract plunder_attacher is Pausable {
 
     address public plunderContractAddress;
     mapping(address => sAttached) public attached;
@@ -48,7 +49,7 @@ contract plunder_attacher {
         return string(slicedStr);
     }
 
-    function attachPlunder(uint256 tokenId, uint _summoner) public {
+    function attachPlunder(uint256 tokenId, uint _summoner) public whenNotPaused() {
         require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
         require(attached[msg.sender].plunderId == 0, "!attached");
 
@@ -60,7 +61,7 @@ contract plunder_attacher {
         modifyAttributes(_summoner, tokenId, 1, true);
     }
 
-    function detachPlunder(uint256 tokenId) public {
+    function detachPlunder(uint256 tokenId) public whenNotPaused() {
         require(attached[msg.sender].plunderId == tokenId, "!owner");
 
         attached[msg.sender].plunderId = 0;
