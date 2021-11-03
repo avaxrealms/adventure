@@ -16,7 +16,7 @@ interface plunder {
 
 contract RealmGold is AccessControl, Pausable {
     string public constant name = "Realm Gold";
-    string public constant symbol = "RGold";
+    string public constant symbol = "RG";
     uint8 public constant decimals = 18;
 
     uint public totalSupply = 0;
