@@ -289,7 +289,8 @@ contract Plunder is ERC721Enumerable, ReentrancyGuard, Ownable {
         parts[18] = '</text><text x="250" y="300" class="title">Plunder</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#ba3e4a;stroke-width:1"/></svg>';
 
         string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], parts[8]));
-        output = string(abi.encodePacked(output, parts[9], parts[10], parts[11], parts[12], parts[13], parts[14], parts[15], parts[16], parts[17], parts[18]));
+        output = string(abi.encodePacked(output, parts[9], parts[10], parts[11], parts[12], parts[13], parts[14], parts[15]));
+        output = string(abi.encodePacked(output, parts[16], parts[17], parts[18]));
 
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Plunder #', toString(tokenId), '", "description": "Plunder", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
         output = string(abi.encodePacked('data:application/json;base64,', json));
