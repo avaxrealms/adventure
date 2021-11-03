@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 interface adventure {
@@ -13,7 +14,7 @@ interface plunder {
     function ownerOf(uint256) external view returns (address);
 }
 
-contract RealmGold is Pausable {
+contract RealmGold is AccessControl, Pausable {
     string public constant name = "Realm Gold";
     string public constant symbol = "RGold";
     uint8 public constant decimals = 18;
@@ -41,6 +42,8 @@ contract RealmGold is Pausable {
     event gameApproval(uint indexed from, uint indexed to, uint amount);
     event Transfer(address indexed from, address indexed to, uint amount);
     event Approval(address indexed owner, address indexed spender, uint amount);
+
+    bytes32 public constant MANAGER = keccak256("MANAGER");
 
     constructor(adventure _adv, plunder _plun) {
         adv = _adv;
@@ -202,5 +205,22 @@ contract RealmGold is Pausable {
 
     function balanceOf(address account) public view returns (uint256) {
         return balances[account];
+    }
+
+
+    function pause() external onlyRole(MANAGER) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(MANAGER) {
+        _unpause();
+    }
+
+    function _unpause() internal override {
+        super._unpause();
+    }
+
+    function _pause() internal override {
+        super._pause();
     }
 }

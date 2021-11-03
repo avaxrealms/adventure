@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 interface adventure {
@@ -21,7 +22,7 @@ interface base_crafting_materials {
     function _mint(uint, uint) external;
 }
 
-contract adventure_dungeon_snowbridge is Pausable {
+contract adventure_dungeon_snowbridge is AccessControl, Pausable {
     string public constant name = "The Snow Bridge";
 
     int public constant dungeon_health = 10;
@@ -33,6 +34,8 @@ contract adventure_dungeon_snowbridge is Pausable {
     adventure adv;
     attributes attr;
     base_crafting_materials craft_m;
+
+    bytes32 public constant MANAGER = keccak256("MANAGER");
 
     constructor(adventure _adv, attributes _attr, base_crafting_materials _craft_m) {
         adv = _adv;
@@ -164,5 +167,21 @@ contract adventure_dungeon_snowbridge is Pausable {
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
         return adv.getApproved(_summoner) == msg.sender || adv.ownerOf(_summoner) == msg.sender;
+    }
+
+    function pause() external onlyRole(MANAGER) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(MANAGER) {
+        _unpause();
+    }
+
+    function _unpause() internal override {
+        super._unpause();
+    }
+
+    function _pause() internal override {
+        super._pause();
     }
 }

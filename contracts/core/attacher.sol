@@ -3,6 +3,7 @@ pragma solidity ^0.8.7;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 interface plunder {
@@ -23,7 +24,7 @@ interface attributes {
     function attribute_decrement(uint, uint32, uint32, uint32, uint32, uint32, uint32) external;
 }
 
-contract plunder_attacher is Pausable {
+contract plunder_attacher is AccessControl, Pausable {
 
     address public plunderContractAddress;
     mapping(address => sAttached) public attached;
@@ -35,6 +36,8 @@ contract plunder_attacher is Pausable {
         uint256 plunderId;
         uint summonerId;
     }
+
+    bytes32 public constant MANAGER = keccak256("MANAGER");
 
     constructor(plunder _plunderContract, attributes _attributesContract) {
         plunderContract = _plunderContract;
@@ -72,7 +75,7 @@ contract plunder_attacher is Pausable {
         modifyAttributes(attached[msg.sender].summonerId, tokenId, 1, false);
     }
 
-    function modifyAttributes(uint _summoner, uint256 tokenId, uint32 _base_bonus, bool increase) internal returns (bool) {
+    function modifyAttributes(uint _summoner, uint256 tokenId, uint32 _base_bonus, bool increase) internal returns (bool bIncrease) {
         uint32 str_bonus = 0;
         uint32 dex_bonus = 0;
 
@@ -139,8 +142,19 @@ contract plunder_attacher is Pausable {
         return false;
     }
 
-//    function containsSuffix(string memory _str) internal pure returns (bool){
-//        return contains(" of ", _str);
-//    }
+    function pause() external onlyRole(MANAGER) {
+        _pause();
+    }
 
+    function unpause() external onlyRole(MANAGER) {
+        _unpause();
+    }
+
+    function _unpause() internal override {
+        super._unpause();
+    }
+
+    function _pause() internal override {
+        super._pause();
+    }
 }

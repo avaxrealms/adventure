@@ -556,6 +556,7 @@ contract Adventure is ERC721Enumerable, AccessControl, Pausable {
     event summoned(address indexed owner, uint class, uint summoner);
     event leveled(address indexed owner, uint level, uint summoner);
 
+    bytes32 public constant MANAGER = keccak256("MANAGER");
     bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
 
     constructor() {
@@ -698,6 +699,22 @@ contract Adventure is ERC721Enumerable, AccessControl, Pausable {
             value /= 10;
         }
         return string(buffer);
+    }
+
+    function pause() external onlyRole(MANAGER) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(MANAGER) {
+        _unpause();
+    }
+
+    function _unpause() internal override {
+        super._unpause();
+    }
+
+    function _pause() internal override {
+        super._pause();
     }
 }
 
