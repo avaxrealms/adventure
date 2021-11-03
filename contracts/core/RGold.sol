@@ -48,6 +48,7 @@ contract RealmGold is AccessControl, Pausable {
     constructor(adventure _adv, plunder _plun) {
         adv = _adv;
         plun = _plun;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function claimByPlunder(uint256 tokenId) external whenNotPaused() {

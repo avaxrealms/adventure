@@ -42,6 +42,7 @@ contract plunder_attacher is AccessControl, Pausable {
     constructor(plunder _plunderContract, attributes _attributesContract) {
         plunderContract = _plunderContract;
         attributesContract = _attributesContract;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function slice(uint256 begin, uint256 end, string memory str) public pure returns (string memory) {

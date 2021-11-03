@@ -41,6 +41,7 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         adv = _adv;
         attr = _attr;
         craft_m = _craft_m;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
 
