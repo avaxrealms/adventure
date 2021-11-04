@@ -27,14 +27,16 @@ interface attributes {
 contract plunder_attacher is AccessControl, Pausable {
 
     address public plunderContractAddress;
-    mapping(address => sAttached) public attached;
+    mapping(uint256 => sAttached) public attachedPlunders;
+    mapping(uint => bool) public summonerAttached;
 
     plunder plunderContract;
     attributes attributesContract;
 
     struct sAttached {
-        uint256 plunderId;
+        address owner;
         uint summonerId;
+        bool attached;
     }
 
     bytes32 public constant MANAGER = keccak256("MANAGER");
@@ -55,10 +57,12 @@ contract plunder_attacher is AccessControl, Pausable {
 
     function attachPlunder(uint256 tokenId, uint _summoner) public whenNotPaused() {
         require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
-        require(attached[msg.sender].plunderId == 0, "!attached");
+        require(attachedPlunders[tokenId].attached != true, "!attached");
+        require(summonerAttached[_summoner] != true, "!attached");
 
-        attached[msg.sender].plunderId = tokenId;
-        attached[msg.sender].summonerId = _summoner;
+        attachedPlunders[tokenId].summonerId = _summoner;
+        attachedPlunders[tokenId].owner = msg.sender;
+        summonerAttached[_summoner] = true;
 
         plunderContract.transferFrom(msg.sender, address(this), tokenId);
 
@@ -66,14 +70,11 @@ contract plunder_attacher is AccessControl, Pausable {
     }
 
     function detachPlunder(uint256 tokenId) public whenNotPaused() {
-        require(attached[msg.sender].plunderId == tokenId, "!owner");
-
-        attached[msg.sender].plunderId = 0;
-        attached[msg.sender].summonerId = 0;
+        require(attachedPlunders[tokenId].owner == msg.sender, "!owner");
 
         plunderContract.transferFrom(address(this), msg.sender, tokenId);
-
-        modifyAttributes(attached[msg.sender].summonerId, tokenId, 1, false);
+        summonerAttached[attachedPlunders[tokenId].summonerId] = false;
+        modifyAttributes(attachedPlunders[tokenId].summonerId, tokenId, 1, false);
     }
 
     function modifyAttributes(uint _summoner, uint256 tokenId, uint32 _base_bonus, bool increase) internal returns (bool bIncrease) {
