@@ -63,6 +63,12 @@ async function main() {
   const codexArmor   = await deployContract("adventure_codex_armor");
   const codexWeapons = await deployContract("adventure_codex_weapons");
 
+  const attacher     = await deployContract(
+    "plunder_attacher",
+    plunder.address,
+    attributes.address
+  );
+
   const adventureSkills = await deployContract(
     "adventure_skills",
     adventure.address,
@@ -84,6 +90,10 @@ async function main() {
   await adventure.grantRole(
     encodeRoleName("MANAGING_CONTRACT"),
     snowBridgeDungeon.address
+  );
+  await attributes.grantRole(
+    encodeRoleName("MANAGING_CONTRACT"),
+    attacher.address
   );
 
   const adventureCrafting = await deployContract(
