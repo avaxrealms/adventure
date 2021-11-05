@@ -44,6 +44,7 @@ contract RealmGold is AccessControl, Pausable {
     event Approval(address indexed owner, address indexed spender, uint amount);
 
     bytes32 public constant MANAGER = keccak256("MANAGER");
+    bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
 
     constructor(adventure _adv, plunder _plun) {
         adv = _adv;
@@ -95,6 +96,16 @@ contract RealmGold is AccessControl, Pausable {
             _gameMint(summoner, wealth_by_level(i));
         }
         claimed[summoner] = _current_level;
+    }
+
+    function managingContractMint(address dst, uint amount) external onlyRole(MANAGING_CONTRACT) returns (address, uint) {
+        _mint(dst, amount);
+         return (dst, amount);
+    }
+
+    function managingContractGameMint(uint dst, uint amount) external onlyRole(MANAGING_CONTRACT) returns (uint, uint) {
+        _gameMint(dst, amount);
+         return (dst, amount);
     }
 
     function _gameMint(uint dst, uint amount) internal {

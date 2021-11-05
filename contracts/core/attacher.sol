@@ -83,6 +83,10 @@ contract plunder_attacher is AccessControl, Pausable {
         modifyAttributes(attachedPlunders[tokenId].summonerId, tokenId, 1, false);
     }
 
+    function isAttached(uint256 tokenId) external view returns (bool) {
+        return summonerAttached[tokenId];
+    }
+
     function modifyAttributes(uint _summoner, uint256 tokenId, uint32 _base_bonus, bool increase) internal returns (bool bIncrease) {
         uint32 str_bonus = 0;
         uint32 dex_bonus = 0;

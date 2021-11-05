@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
 interface adventure {
     function level(uint) external view returns (uint);
     function getApproved(uint) external view returns (address);
@@ -26,16 +28,20 @@ interface codex_skills {
     );
 }
 
-contract adventure_skills {
+contract adventure_skills is AccessControl {
 
     adventure adv;
     attributes attr;
     codex_skills _codex_skills;
 
+    bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
+
     constructor (adventure _adv, attributes _attr, codex_skills _codex_skills_address) {
         adv = _adv;
         attr = _attr;
         _codex_skills = _codex_skills_address;
+
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function class_skills_by_name(uint _class) public view returns (string[] memory) {
@@ -177,6 +183,10 @@ contract adventure_skills {
         for (uint i = 0; i < 36; i++) {
             require(_current_skills[i] <= _skills[i]);
         }
+        skills[_summoner] = _skills;
+    }
+
+    function force_set_skills(uint _summoner, uint8[36] memory _skills) external onlyRole(MANAGING_CONTRACT) {
         skills[_summoner] = _skills;
     }
 }

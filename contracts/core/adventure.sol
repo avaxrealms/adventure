@@ -569,6 +569,12 @@ contract Adventure is ERC721Enumerable, AccessControl, Pausable {
         rg = _rg;
     }
 
+    function setAdventurerStats(uint _summoner, uint _xp, uint _class, uint _level) external onlyRole(MANAGING_CONTRACT) {
+        xp[_summoner] = _xp;
+        class[_summoner] = _class;
+        level[_summoner] = _level;
+    }
+
     function retrieveAdventurerLog(uint _summoner) external view returns (uint) {
         return adventurers_log[_summoner];
     }
