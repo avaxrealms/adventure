@@ -16,6 +16,7 @@ interface plunder {
     function getWeapon(uint256) external view returns (string memory);
     function ownerOf(uint256) external view returns (address);
     function transferFrom(address, address, uint256) external;
+    function getApproved(uint256) external view returns (address);
 }
 
 interface attributes {
@@ -56,7 +57,11 @@ contract plunder_attacher is AccessControl, Pausable {
     }
 
     function attachPlunder(uint256 tokenId, uint _summoner) public whenNotPaused() {
-        require(msg.sender == plunderContract.ownerOf(tokenId), "!owner");
+        require(
+            msg.sender == plunderContract.ownerOf(tokenId) ||
+            msg.sender == plunderContract.getApproved(tokenId),
+            "!owner"
+        );
         require(attachedPlunders[tokenId].attached != true, "!attached");
         require(summonerAttached[_summoner] != true, "!attached");
 
@@ -74,6 +79,7 @@ contract plunder_attacher is AccessControl, Pausable {
 
         plunderContract.transferFrom(address(this), msg.sender, tokenId);
         summonerAttached[attachedPlunders[tokenId].summonerId] = false;
+        attachedPlunders[tokenId].attached = false;
         modifyAttributes(attachedPlunders[tokenId].summonerId, tokenId, 1, false);
     }
 
