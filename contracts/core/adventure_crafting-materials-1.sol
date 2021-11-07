@@ -49,7 +49,9 @@ contract adventure_crafting_materials is AccessControl {
     function _mint(uint dst, uint amount) public onlyRole(MINTER_CONTRACT) returns (uint) {
         totalSupply += amount;
         balanceOf[dst] += amount;
+
         emit Transfer(dst, dst, amount);
+        return amount;
     }
 
     function approve(uint from, uint spender, uint amount) external returns (bool) {
