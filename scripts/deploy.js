@@ -66,6 +66,7 @@ async function main() {
   const attacher     = await deployContract(
     "plunder_attacher",
     plunder.address,
+    adventure.address,
     attributes.address
   );
 
