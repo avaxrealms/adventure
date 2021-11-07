@@ -25,6 +25,10 @@ interface attributes {
     function attribute_decrement(uint, uint32, uint32, uint32, uint32, uint32, uint32) external;
 }
 
+interface adventure {
+    function ownerOf(uint256) external view returns (address);
+}
+
 contract plunder_attacher is AccessControl, Pausable {
 
     address public plunderContractAddress;
@@ -33,6 +37,7 @@ contract plunder_attacher is AccessControl, Pausable {
 
     plunder plunderContract;
     attributes attributesContract;
+    adventure adventureContract;
 
     struct sAttached {
         address owner;
@@ -42,8 +47,9 @@ contract plunder_attacher is AccessControl, Pausable {
 
     bytes32 public constant MANAGER = keccak256("MANAGER");
 
-    constructor(plunder _plunderContract, attributes _attributesContract) {
+    constructor(plunder _plunderContract, adventure _adventureContract, attributes _attributesContract) {
         plunderContract = _plunderContract;
+        adventureContract = _adventureContract;
         attributesContract = _attributesContract;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -60,8 +66,9 @@ contract plunder_attacher is AccessControl, Pausable {
         require(
             msg.sender == plunderContract.ownerOf(tokenId) ||
             msg.sender == plunderContract.getApproved(tokenId),
-            "!owner"
+            "!ownerPlunder"
         );
+        require(msg.sender == adventureContract.ownerOf(_summoner), "!ownerSummoner");
         require(attachedPlunders[tokenId].attached != true, "!attached");
         require(summonerAttached[_summoner] != true, "!attached");
 
