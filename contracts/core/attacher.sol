@@ -34,6 +34,7 @@ contract plunder_attacher is AccessControl, Pausable {
     address public plunderContractAddress;
     mapping(uint256 => sAttached) public attachedPlunders;
     mapping(uint => bool) public summonerAttached;
+    mapping(uint => uint256) public summonerAttachedTo;
 
     plunder plunderContract;
     attributes attributesContract;
@@ -74,6 +75,7 @@ contract plunder_attacher is AccessControl, Pausable {
 
         attachedPlunders[tokenId].summonerId = _summoner;
         attachedPlunders[tokenId].owner = msg.sender;
+        summonerAttachedTo[_summoner] = tokenId;
         summonerAttached[_summoner] = true;
 
         plunderContract.transferFrom(msg.sender, address(this), tokenId);
@@ -87,6 +89,8 @@ contract plunder_attacher is AccessControl, Pausable {
         plunderContract.transferFrom(address(this), msg.sender, tokenId);
         summonerAttached[attachedPlunders[tokenId].summonerId] = false;
         attachedPlunders[tokenId].attached = false;
+
+        summonerAttachedTo[_summoner] = 10001;
         modifyAttributes(attachedPlunders[tokenId].summonerId, tokenId, 1, false);
     }
 
