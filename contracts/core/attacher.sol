@@ -90,7 +90,7 @@ contract plunder_attacher is AccessControl, Pausable {
         summonerAttached[attachedPlunders[tokenId].summonerId] = false;
         attachedPlunders[tokenId].attached = false;
 
-        summonerAttachedTo[_summoner] = 10001;
+        summonerAttachedTo[attachedPlunders[tokenId].summonerId] = 10001;
         modifyAttributes(attachedPlunders[tokenId].summonerId, tokenId, 1, false);
     }
 
