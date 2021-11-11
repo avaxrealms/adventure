@@ -12,6 +12,8 @@ interface adventure {
 
 interface plunder {
     function ownerOf(uint256) external view returns (address);
+    function balanceOf(address owner) external view returns (uint256);
+    function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 tokenId);
 }
 
 contract RealmGold is AccessControl, Pausable {
@@ -55,6 +57,13 @@ contract RealmGold is AccessControl, Pausable {
     function claimByPlunder(uint256 tokenId) external whenNotPaused() {
         require(msg.sender == plun.ownerOf(tokenId), "!owner");
         _claim(tokenId, msg.sender);
+    }
+
+    function claimForAllPlunders() external whenNotPaused() {
+        uint balance = plun.balanceOf(msg.sender);
+        for (uint i = 0; i < balance; i++) {
+            _claim(plun.tokenOfOwnerByIndex(msg.sender, i), msg.sender);
+        }
     }
 
     function _claim(uint256 tokenId, address tokenOwner) internal {
