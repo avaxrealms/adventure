@@ -54,15 +54,19 @@ contract RealmGold is AccessControl, Pausable {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function claimByPlunder(uint256 tokenId) external whenNotPaused() {
+    function claimByPlunder(uint256 tokenId) public whenNotPaused() {
         require(msg.sender == plun.ownerOf(tokenId), "!owner");
         _claim(tokenId, msg.sender);
     }
 
     function claimForAllPlunders() external whenNotPaused() {
         uint balance = plun.balanceOf(msg.sender);
+        require(balance > 0, "No plunders");
         for (uint i = 0; i < balance; i++) {
-            _claim(plun.tokenOfOwnerByIndex(msg.sender, i), msg.sender);
+            uint256 tokenId = plun.tokenOfOwnerByIndex(msg.sender, i);
+            if (dropped[tokenId] == 0) {
+                claimByPlunder(tokenId);
+            }
         }
     }
 
