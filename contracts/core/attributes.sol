@@ -32,10 +32,20 @@ contract adventure_attributes is AccessControl {
         uint32 charisma;
     }
 
+    struct penalty_ability_score {
+        uint32 strength;
+        uint32 dexterity;
+        uint32 constitution;
+        uint32 intelligence;
+        uint32 wisdom;
+        uint32 charisma;
+    }
+
     bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
 
     mapping(uint => ability_score) public ability_scores;
     mapping(uint => bonus_ability_score) public bonus_ability_scores;
+    mapping(uint => penalty_ability_score) public penalty_ability_scores;
     mapping(uint => uint) public level_points_spent;
     mapping(uint => bool) public character_created;
 
@@ -86,6 +96,32 @@ contract adventure_attributes is AccessControl {
         _attrs.charisma = _attrs.charisma - _cha;
 
         bonus_ability_scores[_summoner] = _attrs;
+    }
+
+    function penalty_attribute_increment(uint _summoner, uint32 _str, uint32 _dex, uint32 _const, uint32 _int, uint32 _wis, uint32 _cha) external onlyRole(MANAGING_CONTRACT) {
+        penalty_ability_score storage _attrs = penalty_ability_scores[_summoner];
+
+        _attrs.strength = _attrs.strength + _str;
+        _attrs.dexterity = _attrs.dexterity + _dex;
+        _attrs.constitution = _attrs.constitution + _const;
+        _attrs.intelligence = _attrs.intelligence + _int;
+        _attrs.wisdom = _attrs.wisdom + _wis;
+        _attrs.charisma = _attrs.charisma + _cha;
+
+        penalty_ability_scores[_summoner] = _attrs;
+    }
+
+    function penalty_attribute_decrement(uint _summoner, uint32 _str, uint32 _dex, uint32 _const, uint32 _int, uint32 _wis, uint32 _cha) external onlyRole(MANAGING_CONTRACT) {
+        penalty_ability_score storage _attrs = penalty_ability_scores[_summoner];
+
+        _attrs.strength = _attrs.strength - _str;
+        _attrs.dexterity = _attrs.dexterity - _dex;
+        _attrs.constitution = _attrs.constitution - _const;
+        _attrs.intelligence = _attrs.intelligence - _int;
+        _attrs.wisdom = _attrs.wisdom - _wis;
+        _attrs.charisma = _attrs.charisma - _cha;
+
+        penalty_ability_scores[_summoner] = _attrs;
     }
 
     function calculate_point_buy(uint _str, uint _dex, uint _const, uint _int, uint _wis, uint _cha) public pure returns (uint) {
