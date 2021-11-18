@@ -23,9 +23,19 @@ contract adventure_attributes is AccessControl {
         uint32 charisma;
     }
 
+    struct bonus_ability_score {
+        uint32 strength;
+        uint32 dexterity;
+        uint32 constitution;
+        uint32 intelligence;
+        uint32 wisdom;
+        uint32 charisma;
+    }
+
     bytes32 public constant MANAGING_CONTRACT = keccak256("MANAGING_CONTRACT");
 
     mapping(uint => ability_score) public ability_scores;
+    mapping(uint => bonus_ability_score) public bonus_ability_scores;
     mapping(uint => uint) public level_points_spent;
     mapping(uint => bool) public character_created;
 
@@ -53,7 +63,8 @@ contract adventure_attributes is AccessControl {
     }
 
     function attribute_increment(uint _summoner, uint32 _str, uint32 _dex, uint32 _const, uint32 _int, uint32 _wis, uint32 _cha) external onlyRole(MANAGING_CONTRACT) {
-        ability_score storage _attrs = ability_scores[_summoner];
+        bonus_ability_score storage _attrs = bonus_ability_scores[_summoner];
+
         _attrs.strength = _attrs.strength + _str;
         _attrs.dexterity = _attrs.dexterity + _dex;
         _attrs.constitution = _attrs.constitution + _const;
@@ -61,11 +72,12 @@ contract adventure_attributes is AccessControl {
         _attrs.wisdom = _attrs.wisdom + _wis;
         _attrs.charisma = _attrs.charisma + _cha;
 
-        ability_scores[_summoner] = _attrs;
+        bonus_ability_scores[_summoner] = _attrs;
     }
 
     function attribute_decrement(uint _summoner, uint32 _str, uint32 _dex, uint32 _const, uint32 _int, uint32 _wis, uint32 _cha) external onlyRole(MANAGING_CONTRACT) {
-        ability_score storage _attrs = ability_scores[_summoner];
+        bonus_ability_score storage _attrs = bonus_ability_scores[_summoner];
+
         _attrs.strength = _attrs.strength - _str;
         _attrs.dexterity = _attrs.dexterity - _dex;
         _attrs.constitution = _attrs.constitution - _const;
@@ -73,7 +85,7 @@ contract adventure_attributes is AccessControl {
         _attrs.wisdom = _attrs.wisdom - _wis;
         _attrs.charisma = _attrs.charisma - _cha;
 
-        ability_scores[_summoner] = _attrs;
+        bonus_ability_scores[_summoner] = _attrs;
     }
 
     function calculate_point_buy(uint _str, uint _dex, uint _const, uint _int, uint _wis, uint _cha) public pure returns (uint) {
@@ -149,19 +161,20 @@ contract adventure_attributes is AccessControl {
         {
         string[7] memory parts;
         ability_score memory _attr = ability_scores[_summoner];
+        bonus_ability_score memory _battr = bonus_ability_scores[_summoner];
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base, .title, .id {fill: #16140a; font-family: nocturne-serif, "Nocturne Serif", serif; font-size: 9.7px; font-weight: 500;} .title{font-size:16px;} .id{font-size:12px; fill: #ba3e4a;}</style><style>@import url("https://use.typekit.net/nln0qsp.css");</style><rect width="100%" height="100%" fill="#bfb67f" /><text x="25" y="70" class="base">';
 
-        parts[1] = string(abi.encodePacked("Strength", " ", toString(_attr.strength), '</text><text x="25" y="90" class="base">'));
+        parts[1] = string(abi.encodePacked("Strength", " ", toString(_attr.strength + _battr.strength), '</text><text x="25" y="90" class="base">'));
 
-        parts[2] = string(abi.encodePacked("Dexterity", " ", toString(_attr.dexterity), '</text><text x="25" y="110" class="base">'));
+        parts[2] = string(abi.encodePacked("Dexterity", " ", toString(_attr.dexterity + _battr.dexterity), '</text><text x="25" y="110" class="base">'));
 
-        parts[3] = string(abi.encodePacked("Constitution", " ", toString(_attr.constitution), '</text><text x="25" y="130" class="base">'));
+        parts[3] = string(abi.encodePacked("Constitution", " ", toString(_attr.constitution + _battr.constitution), '</text><text x="25" y="130" class="base">'));
 
-        parts[4] = string(abi.encodePacked("Intelligence", " ", toString(_attr.intelligence),  '</text><text x="25" y="150" class="base">'));
+        parts[4] = string(abi.encodePacked("Intelligence", " ", toString(_attr.intelligence + _battr.intelligence),  '</text><text x="25" y="150" class="base">'));
 
-        parts[5] = string(abi.encodePacked("Wisdom", " ", toString(_attr.wisdom), '</text><text x="25" y="170" class="base">'));
+        parts[5] = string(abi.encodePacked("Wisdom", " ", toString(_attr.wisdom + _battr.wisdom), '</text><text x="25" y="170" class="base">'));
 
-        parts[6] = string(abi.encodePacked("Charisma", " ", toString(_attr.charisma), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
+        parts[6] = string(abi.encodePacked("Charisma", " ", toString(_attr.charisma + _battr.charisma), '</text><text x="310" y="300" class="title" text-anchor="end">Adventure</text><line x1="175" y1="305" x2="310" y2="305" style="stroke:#3e9aae;stroke-width:1"/></svg>'));
 
         output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]));
         }

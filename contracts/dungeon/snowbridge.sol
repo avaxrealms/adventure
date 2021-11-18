@@ -16,6 +16,7 @@ interface adventure {
 interface attributes {
     function character_created(uint) external view returns (bool);
     function ability_scores(uint) external view returns (uint32,uint32,uint32,uint32,uint32,uint32);
+    function bonus_ability_scores(uint) external view returns (uint32,uint32,uint32,uint32,uint32,uint32);
 }
 
 interface base_crafting_materials {
@@ -142,6 +143,10 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         uint _level = adv.level(_summoner);
         uint _class = adv.class(_summoner);
         (uint32 _str, uint32 _dex, uint32 _const,,,) = attr.ability_scores(_summoner);
+        (uint32 _bstr, uint32 _bdex, uint32 _bconst,,,) = attr.bonus_ability_scores(_summoner);
+        _str += _bstr;
+        _dex += _bdex;
+        _const += _bconst;
         int _health = int(health_by_class_and_level(_class, _level, _const));
         int _dungeon_health = dungeon_health;
         int _damage = int(damage(_str));
