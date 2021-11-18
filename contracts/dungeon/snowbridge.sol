@@ -145,10 +145,13 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         uint _class = adv.class(_summoner);
         (uint32 _str, uint32 _dex, uint32 _const,,,) = attr.ability_scores(_summoner);
         (uint32 _bstr, uint32 _bdex, uint32 _bconst,,,) = attr.bonus_ability_scores(_summoner);
-        (uint32 _pstr, uint32 _pdex, uint32 _pconst,,,) = attr.bonus_ability_scores(_summoner);
-        _str = _str + _bstr - _pstr;
-        _dex = _dex + _bdex - _pdex;
-        _const = _const + _bconst - _pconst;
+        _str += _bstr;
+        _dex += _bdex;
+        _const += _bconst;
+        (_bstr, _bdex, _bconst,,,) = attr.penalty_ability_scores(_summoner);
+        _str -= _bstr;
+        _dex -= _bdex;
+        _const -= _bconst;
         int _health = int(health_by_class_and_level(_class, _level, _const));
         int _dungeon_health = dungeon_health;
         int _damage = int(damage(_str));
