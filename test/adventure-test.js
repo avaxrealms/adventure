@@ -48,7 +48,7 @@ describe("Adventure", function () {
     sd = await _sd.deploy(adv.address, attr.address, craft_m.address);
 
     _attacher = await ethers.getContractFactory("plunder_attacher");
-    attacher = await _attacher.deploy(plunder.address, attr.address);
+    attacher = await _attacher.deploy(plunder.address, adv.address, attr.address);
 
     await attacher.deployed().then(async () => {
       await attr.grantRole(
