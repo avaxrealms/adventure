@@ -177,7 +177,6 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         reward = scout(_summoner);
 
         if (reward >= 1) {
-            uint xpCurrent = adv.xp(_summoner);
             realmgold.managingContractGameMint(_summoner, 50e18);
             adv.setAdventurerStats(_summoner, adv.xp(_summoner)+50e18, adv.class(_summoner), adv.level(_summoner));
             return reward;
