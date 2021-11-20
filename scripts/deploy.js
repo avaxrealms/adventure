@@ -50,8 +50,8 @@ async function main() {
 
   const attributes = await deployContract("adventure_attributes", adventure.address);
 
-  const codexSkills     = await deployContract("adventure_codex_skills");
-  const codexBaseRandom = await deployContract("codex_random");
+  // const codexSkills     = await deployContract("adventure_codex_skills");
+  // const codexBaseRandom = await deployContract("codex_random");
 
   const adventureCraftingMaterials = await deployContract(
     "adventure_crafting_materials",
@@ -59,9 +59,9 @@ async function main() {
     attributes.address
   );
 
-  const codexGoods   = await deployContract("adventure_codex_goods");
-  const codexArmor   = await deployContract("adventure_codex_armor");
-  const codexWeapons = await deployContract("adventure_codex_weapons");
+  // const codexGoods   = await deployContract("adventure_codex_goods");
+  // const codexArmor   = await deployContract("adventure_codex_armor");
+  // const codexWeapons = await deployContract("adventure_codex_weapons");
 
   const attacher     = await deployContract(
     "plunder_attacher",
@@ -70,18 +70,18 @@ async function main() {
     attributes.address
   );
 
-  const adventureSkills = await deployContract(
+  /* const adventureSkills = await deployContract(
     "adventure_skills",
     adventure.address,
     attributes.address,
     codexSkills.address
-  );
+  ); */
 
   const snowBridgeDungeon = await deployContract(
     "adventure_dungeon_snowbridge",
     adventure.address,
     attributes.address,
-    adventureCraftingMaterials.address
+    rGold.address
   );
 
   await adventureCraftingMaterials.grantRole(
@@ -97,7 +97,7 @@ async function main() {
     attacher.address
   );
 
-  const adventureCrafting = await deployContract(
+  /* const adventureCrafting = await deployContract(
     "adventure_crafting",
     adventure.address,
     attributes.address,
@@ -108,7 +108,7 @@ async function main() {
     codexGoods.address,
     codexArmor.address,
     codexWeapons.address
-  );
+  ); */
 }
 
 function writeAddressesFile() {
