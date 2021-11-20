@@ -538,8 +538,8 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
 
 contract Adventure is ERC721Enumerable, AccessControl, Pausable {
     uint public next_summoner;
-    uint constant xp_per_day = 250e18;
-    uint constant DAY = 1 days;
+    uint xp_per_day = 250e18;
+    uint DAY = 1 days;
 
     string constant name = "Avaxrealms Adventure";
     string constant symbol = "ARA";
@@ -569,10 +569,17 @@ contract Adventure is ERC721Enumerable, AccessControl, Pausable {
         rg = _rg;
     }
 
-    function setAdventurerStats(uint _summoner, uint _xp, uint _class, uint _level) external onlyRole(MANAGING_CONTRACT) {
+    function setAdventurerStats(uint _summoner, uint _xp, uint _class, uint _level) external onlyRole(MANAGING_CONTRACT) returns (uint, uint, uint) {
         xp[_summoner] = _xp;
         class[_summoner] = _class;
         level[_summoner] = _level;
+
+        return (xp[_summoner], class[_summoner], level[_summoner]);
+    }
+
+    function setAdventuringRates(uint _xp, uint _day) external onlyRole(MANAGING_CONTRACT) {
+        xp_per_day = _xp;
+        DAY = _day;
     }
 
     function retrieveAdventurerLog(uint _summoner) external view returns (uint) {
