@@ -7,10 +7,12 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 interface adventure {
     function level(uint) external view returns (uint);
     function class(uint) external view returns (uint);
+    function xp(uint) external view returns (uint);
     function getApproved(uint) external view returns (address);
     function ownerOf(uint) external view returns (address);
     function retrieveAdventurerLog(uint) external returns (uint);
     function setAdventurerLog(uint, uint) external returns (uint);
+    function setAdventurerStats(uint _summoner, uint _xp, uint _class, uint _level) external;
 }
 
 interface attributes {
@@ -20,8 +22,8 @@ interface attributes {
     function penalty_ability_scores(uint) external view returns (uint32,uint32,uint32,uint32,uint32,uint32);
 }
 
-interface base_crafting_materials {
-    function _mint(uint, uint) external;
+interface gold {
+    function managingContractGameMint(uint dst, uint amount) external returns (uint, uint);
 }
 
 contract adventure_dungeon_snowbridge is AccessControl, Pausable {
@@ -35,14 +37,14 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
 
     adventure adv;
     attributes attr;
-    base_crafting_materials craft_m;
+    gold realmgold;
 
     bytes32 public constant MANAGER = keccak256("MANAGER");
 
-    constructor(adventure _adv, attributes _attr, base_crafting_materials _craft_m) {
+    constructor(adventure _adv, attributes _attr, gold _realmgold) {
         adv = _adv;
         attr = _attr;
-        craft_m = _craft_m;
+        realmgold = _realmgold;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -173,7 +175,13 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         require(block.timestamp > adv.retrieveAdventurerLog(_summoner), "!log");
         adv.setAdventurerLog(_summoner, block.timestamp + DAY);
         reward = scout(_summoner);
-        craft_m._mint(_summoner, reward);
+
+        if (reward >= 1) {
+            uint xpCurrent = adv.xp(_summoner);
+            realmgold.managingContractGameMint(_summoner, 50e18);
+            adv.setAdventurerStats(_summoner, adv.xp(_summoner)+50e18, adv.class(_summoner), adv.level(_summoner));
+            return reward;
+        }
     }
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
