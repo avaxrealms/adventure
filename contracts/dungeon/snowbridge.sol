@@ -48,7 +48,11 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function scout(uint _summoner) public view returns (uint reward) {
+    function scout(uint _summoner) public view returns (string memory reward) {
+        reward = "75 XP and 75 RG";
+    }
+
+    function _scout(uint _summoner) internal view returns (uint reward) {
         reward = 1;
     }
 
@@ -56,7 +60,7 @@ contract adventure_dungeon_snowbridge is AccessControl, Pausable {
         require(_isApprovedOrOwner(_summoner), "!owner");
         require(block.timestamp > adv.retrieveAdventurerLog(_summoner), "!log");
         adv.setAdventurerLog(_summoner, block.timestamp + DAY);
-        reward = scout(_summoner);
+        reward = _scout(_summoner);
 
         if (reward >= 1) {
             realmgold.managingContractGameMint(_summoner, 75e18);
