@@ -23,8 +23,8 @@ contract RealmGold is AccessControl, Pausable {
 
     uint public totalSupply = 0;
 
-    // Every Plunderer is entitled to 10,000 Realm Gold
-    uint256 public realmGoldPerTokenId = 500 * (10**decimals);
+    // Every Plunderer is entitled to 37,500 Realm Gold
+    uint256 public realmGoldPerTokenId = 37500 * (10**decimals);
 
     uint256 public tokenIdStart = 0;
     uint256 public tokenIdEnd = 10000;
